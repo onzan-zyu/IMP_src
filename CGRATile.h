@@ -23,11 +23,11 @@ namespace HyCUBESim {
 
 	class CGRATile {
 		public:
-			CGRATile(int x, int y, bool mem, std::map<DataType,uint8_t>* dmemPtr);
+			CGRATile(int x, int y, bool mem, std::map<DataType,uint8_t>* dmemPtr,int CGRA_MEMSIZE);
 			std::map<Dir,std::pair<bool,DataType>> inputs;
 			std::map<Dir,CGRATile*> connectedTiles;
 
-			void execute(int kII,int count);
+			void execute(int kII);
 			void executeFinish(HyIns currIns, bool ALU_valid, DataType ALU_Data);
 			void updatePC();
 			void updateRegisters();
@@ -55,6 +55,7 @@ namespace HyCUBESim {
 			int X;
 			int Y;
 			bool MEM;
+			int CGRA_MEMSIZE;
 
 			std::map<Dir,std::pair<bool,DataType>> inputsXBar;
 
@@ -105,8 +106,8 @@ namespace HyCUBESim {
 			DataType cmerge(DataType op1, DataType op2);
 			DataType loadcl(DataType op1, DataType op2);
 			DataType movcl(DataType op1, DataType op2);
-			DataType load(DataType op2, int size,int cycle,int count);
-			DataType store(DataType op1, DataType op2,int size,int cycle,int count);
+			DataType load(DataType op2, int size,int cycle);
+			DataType store(DataType op1, DataType op2,int size,int cycle);
 			DataType jumpl(DataType op2);
 		};
 

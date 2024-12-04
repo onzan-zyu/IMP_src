@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
 	#else
 		while(cgraInstance.dmem[MEM_SIZE/2-1]==0){//loopEnd变为1之前 表示没有结束
 			cgraInstance.executeCycle(count);
-			printf("count=%d\n",count);
+			// printf("count=%d\n",count);
 			count++;
 		}
 

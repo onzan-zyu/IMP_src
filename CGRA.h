@@ -12,6 +12,7 @@
 #include "CGRATile.h"
 #include <fstream>
 #include "debug.h"
+#include "IMP/IPD.h"
 
 
 //Uncomment this for 16-bit full chip

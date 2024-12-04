@@ -63,7 +63,8 @@ void log_address(LogLevel level, const char *file, int line, const char *format,
     va_list args;
     va_start(args, format);
     // fprintf(logFile, "[%s] %s (%s:%d): ", level_str, timeBuffer, file, line);
-    fprintf(logFile, "(%s:%d): ",  file, line);
+    // fprintf(logFile, "(%s:%d): ",  file, line);
+    fprintf(logFile, "(%d): ",  line);
     vfprintf(logFile, format, args);
     fprintf(logFile, "\n");
     va_end(args);
@@ -131,7 +132,8 @@ void log_buffer(LogLevel level, const char *file, int line, const char *format, 
     va_list args;
     va_start(args, format);
     // fprintf(logFile, "[%s] %s (%s:%d): ", level_str, timeBuffer, file, line);
-    fprintf(logFile, "(%s:%d): ",  file, line);
+    fprintf(logFile, "(%d): ", line);
+    // fprintf(logFile, "(%s:%d): ",  file, line);
     vfprintf(logFile, format, args);
     fprintf(logFile, "\n");
     va_end(args);

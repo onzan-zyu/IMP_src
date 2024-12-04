@@ -31,7 +31,7 @@ typedef struct{
 	uint32_t constant;
 	bool constValid;
 	bool NPB;
-	uint64_t currrent_cycle;
+	uint64_t current_cycle;
 } HyIns;
 
 #endif

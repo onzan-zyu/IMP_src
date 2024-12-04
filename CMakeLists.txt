@@ -12,7 +12,7 @@
 # target_compile_features(${PROJ} PRIVATE cxx_range_for cxx_auto_type)
 # #target_link_libraries(${PROJ} nlohmann_json::nlohmann_json)
 cmake_minimum_required(VERSION 3.22)
-#project(hycube_simulator)
+project(hycube_simulator)
 # include_directories(${CMAKE_CURRENT_SOURCE_DIR}/IMP)
 FILE(GLOB MyCPPSources *.cpp )
 FILE(GLOB MyHSources *.h IMP/*.h)

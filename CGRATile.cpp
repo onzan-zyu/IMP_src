@@ -7,14 +7,16 @@
 
 #include "CGRATile.h"
 
+int prev_cycle=0;
 namespace HyCUBESim {
 
-	CGRATile::CGRATile(int x, int y, bool mem, std::map<DataType,uint8_t>* dmemPtr) {
+	CGRATile::CGRATile(int x, int y, bool mem, std::map<DataType,uint8_t>* dmemPtr,int CGRA_MEMSIZE) {
 		// TODO Auto-generated constructor stub
 		this->X = x;
 		this->Y = y;
 		this->MEM = mem;
 		this->dmemPtr = dmemPtr;
+		this->CGRA_MEMSIZE = CGRA_MEMSIZE;
 
 		prevIns.opcode=NOP;
 		prevIns.xB.P=INV;
@@ -25,20 +27,24 @@ namespace HyCUBESim {
 		prevIns.xB.WEST_O=INV;
 		prevIns.xB.SOUTH_O=INV;
 	}
-
-	void CGRATile::execute(int kII,int count) {
+////  region
+	void CGRATile::execute(int kII) {
 		LOG(SIMULATOR) << "---------------execute new instruction ----------------------------\n";
 		LOG(SIMULATOR) << "current PC = " << PC << ",LER=" << LER << ",LSR=" << LSR << "\n";
 		LOG(SIMULATOR) << "kII =" << kII << ",PC =" << PC << ",y=" << Y << ",x=" << X << "\n";
 		LOG(SIMULATOR) << "RegInfo ::\n";
 		this->printRegisterInfo();
 		
-		
+
 		HyIns currIns = configMem[PC];
 		std::string opstr  = opcodeStr(currIns.opcode);
-		LOG_TXT(LOG_INFO, "current cycle=%d op=%s PC=%d,LSR=%d,LER=%d,kII=%d,X=%d,Y=%d",currIns.currrent_cycle, opstr.c_str(),PC,LSR,LER ,kII,X,Y);
+		LOG_TXT(LOG_INFO, "current cycle=%d op=%s PC=%d,LSR=%d,LER=%d,kII=%d,X=%d,Y=%d",currIns.current_cycle, opstr.c_str(),PC,LSR,LER ,kII,X,Y);
 		LOG(SIMULATOR) << "currIns ::\n";
 		printIns(currIns);
+		if(currIns.current_cycle < prev_cycle){   // cycle达到最大II之后 会回到0 执行完一个循环
+			RWBuffers[bufferIdx++] = {-1,true,0,0};
+		}
+		prev_cycle = currIns.current_cycle;
 		DataType result;
 
 		bool predicate;
@@ -222,18 +228,18 @@ namespace HyCUBESim {
 			case LOAD :
 				LOG(SIMULATOR) << ": LOAD," << operand1 << "," << operand2 << "\n";
 #ifdef ARCHI_16BIT
-				ALUTempOut = load(operand2,2,currIns.currrent_cycle,count);
+				ALUTempOut = load(operand2,2,currIns.current_cycle);
 #else
-				ALUTempOut = load(operand2,4,currIns.currrent_cycle,count);
+				ALUTempOut = load(operand2,4,currIns.current_cycle);
 #endif
 				break;
 			case LOADH :
 				LOG(SIMULATOR) << ": LOADH," << operand1 << "," << operand2 << "\n";
-				ALUTempOut = load(operand2,2,currIns.currrent_cycle,count);
+				ALUTempOut = load(operand2,2,currIns.current_cycle);
 				break;
 			case LOADB :
 				LOG(SIMULATOR) << ": LOADB," << operand1 << "," << operand2 << "\n";
-				ALUTempOut = load(operand2,1,currIns.currrent_cycle,count);
+				ALUTempOut = load(operand2,1,currIns.current_cycle);
 				break;
 			case STORE :
 				LOG(SIMULATOR) << ": STORE," << operand1 << "," << operand2 << "\n";
@@ -241,9 +247,9 @@ namespace HyCUBESim {
 					//only store after checking predicate
 					//other operations dont care as the output is not routed.
 #ifdef ARCHI_16BIT
-					ALUTempOut = store(operand1,operand2,2,currIns.currrent_cycle,count);
+					ALUTempOut = store(operand1,operand2,2,currIns.current_cycle);
 #else
-					ALUTempOut = store(operand1,operand2,4,currIns.currrent_cycle,count);
+					ALUTempOut = store(operand1,operand2,4,currIns.current_cycle);
 #endif
 				}
 				break;
@@ -252,7 +258,7 @@ namespace HyCUBESim {
 				if(!Pisvalid || predicate){
 					//only store after checking predicate
 					//other operations dont care as the output is not routed.
-					ALUTempOut = store(operand1,operand2,2,currIns.currrent_cycle,count);
+					ALUTempOut = store(operand1,operand2,2,currIns.current_cycle);
 				}
 				break;
 			case STOREB :
@@ -260,7 +266,7 @@ namespace HyCUBESim {
 				if(!Pisvalid || predicate){
 					//only store after checking predicate
 					//other operations dont care as the output is not routed.
-					ALUTempOut = store(operand1,operand2,1,currIns.currrent_cycle,count);
+					ALUTempOut = store(operand1,operand2,1,currIns.current_cycle);
 				}
 				break;
 			case JUMPL :
@@ -290,7 +296,7 @@ namespace HyCUBESim {
 
 		executeFinish(currIns,true,ALUTempOut);
 	}
-
+//// endregion
 	void CGRATile::executeFinish(HyIns currIns, bool ALU_valid, DataType ALU_Data) {
 
 //		if(MEM){
@@ -907,8 +913,8 @@ namespace HyCUBESim {
 		return op1;
 	}
 	// cycle是config memory在映射上的cycle
-	DataType CGRATile::load(DataType op2, int size,int cycle,int count) {
-		printf("load X=%d,Y=%d,current cycle=%d,address:%d",this->X ,this->Y,cycle,op2);
+	DataType CGRATile::load(DataType op2, int size,int cycle) {
+		// printf("load X=%d,Y=%d,current cycle=%d,address:%d",this->X ,this->Y,cycle,op2);
 		assert(size == 1 || size == 2 || size == 4);
 		
 		DataType res = 0;
@@ -924,15 +930,21 @@ namespace HyCUBESim {
 			res = res | (*dmemPtr)[op2] | ((*dmemPtr)[op2+1] << 8) | ((*dmemPtr)[op2+2] << 16) | ((*dmemPtr)[op2+3] << 24);
 		}
 		// printf(" load data=%d\n",res);
-		RWBuffers[bufferIdx++] = {(uint8_t)cycle,true,res,op2};
+		//loopstart 和loop end的读入过滤
+		if(op2!=this->CGRA_MEMSIZE-2 && op2!=(this->CGRA_MEMSIZE-2)/2){
+			RWBuffers[bufferIdx++] = {(uint8_t)cycle,true,res,op2};
+		}
+		
 		LOG_load_store(LOG_INFO,"load X=%d,Y=%d,current cycle=%d,address:%d,size:%d,load data =%d\n",this->X ,this->Y,cycle,op2,size,res);
 		return res;
 	}
 
-	DataType CGRATile::store(DataType op1, DataType op2, int size,int cycle,int count) {
-		printf("X=%d,Y=%d,current cycle=%d,store address:%d,store data=%d\n",this->X ,this->Y,cycle,op2,op1);
+	DataType CGRATile::store(DataType op1, DataType op2, int size,int cycle) {
+		// printf("X=%d,Y=%d,current cycle=%d,store address:%d,store data=%d\n",this->X ,this->Y,cycle,op2,op1);
 		LOG_load_store(LOG_INFO,"store X=%d,Y=%d,current cycle=%d,address:%d size=%d store data=%d",this->X ,this->Y,cycle,op2,size,op1);
-		RWBuffers[bufferIdx++] = {(uint8_t)cycle,false,op1,op2};
+		if(op2!=this->CGRA_MEMSIZE-2 && op2!=(this->CGRA_MEMSIZE-2)/2){
+			RWBuffers[bufferIdx++] = {(uint8_t)cycle,false,op1,op2};
+		}
 		assert(size == 1 || size == 2 || size == 4);
 		DataType res = 0;
 		if(size == 1){

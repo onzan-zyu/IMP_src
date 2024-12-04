@@ -23,9 +23,9 @@ CGRA::CGRA(int SizeX, int SizeY,int type, int MemSize) {
 	for (int y = 0; y < SizeY; ++y) {
 		for (int x = 0; x < SizeX; ++x) {
 			if(type == 1)
-				CGRATiles[y][x] = new CGRATile(x,y,(x==0),&dmem);
+				CGRATiles[y][x] = new CGRATile(x,y,(x==0),&dmem,MemSize);
 			else if(type == 2)
-				CGRATiles[y][x] = new CGRATile(x,y,(x==0 or (x==SizeX-1)),&dmem);
+				CGRATiles[y][x] = new CGRATile(x,y,(x==0 or (x==SizeX-1)),&dmem,MemSize);
 		}
 	}
 
@@ -72,7 +72,7 @@ int CGRA::configCGRA(std::string CMEMFileName,int xdim, int ydim) {
 	std::ifstream cmemfile(CMEMFileName.c_str());
 	std::string line;
 	LOG(SIMULATOR) << CMEMFileName << "\n";
-	assert(cmemfile.is_open() && 'Error opening cmem file');
+	assert(cmemfile.is_open() && "Error opening cmem file");
 
 	//ignoring the first line
 	std::getline(cmemfile,line);
@@ -90,7 +90,7 @@ int CGRA::configCGRA(std::string CMEMFileName,int xdim, int ydim) {
 	    int t;
 
 	    iss >> t;   // cycle   增加每个配置所属的cycle
-		printf("read cycle:%d\n",t);
+		// printf("read cycle:%d\n",t);
 		std::string phyloc;
 		    std::string op;
 	    for (int i = 0; i < xdim*ydim; ++i) {
@@ -108,7 +108,7 @@ int CGRA::configCGRA(std::string CMEMFileName,int xdim, int ydim) {
 		    LOG(SIMULATOR) << "T=" << t << ",Y=" << y << ",X=" << x << "," << op << "\n";
 
 		    HyIns currIns;
-			currIns.currrent_cycle = t;
+			currIns.current_cycle = t;
 		    if(atoi(op.substr(0,1).c_str())==1){
 		    	currIns.NPB=true;
 		    }
@@ -125,7 +125,7 @@ int CGRA::configCGRA(std::string CMEMFileName,int xdim, int ydim) {
 
 			currIns.constant = std::stoi(/*op.substr(46,3) +*/ op.substr(2,27+5),nullptr,2);
 			/////////////////////////////////////////////
-			printf("currIns.constant=%d  binary=",currIns.constant);
+			// printf("currIns.constant=%d  binary=",currIns.constant);
 			printBinary(currIns.constant);
 			////////////////////////////////////////////
 			if((currIns.constant >> 26) == 1){ //negative number identification
@@ -181,7 +181,7 @@ int CGRA::parseDMEM(std::string DMEMFileName) {
 	std::ifstream dmemfile(DMEMFileName.c_str());
 	std::string line;
 
-	assert(dmemfile.is_open() && 'Error opening dmem file');
+	assert(dmemfile.is_open() && "Error opening dmem file");
 
 	//ignore the first line
 	std::getline(dmemfile,line);
@@ -212,8 +212,8 @@ int CGRA::parseDMEM(std::string DMEMFileName,std::string memallocFileName) {
 	std::ifstream dmemfile(DMEMFileName.c_str());
 	std::ifstream memallocfile(memallocFileName.c_str());
 	std::string line;
-	assert(dmemfile.is_open() && 'Error opening dmem file');
-	assert(memallocfile.is_open() && 'Error opening memalloc file');
+	assert(dmemfile.is_open() && "Error opening dmem file");
+	assert(memallocfile.is_open() && "Error opening memalloc file");
 	//ignore the first line
 	std::getline(dmemfile,line);
 	std::getline(memallocfile,line);
@@ -325,16 +325,28 @@ void CGRA::invokeCGRA(HyCUBESim::CGRA& cgraInstance) {
 int CGRA::executeCycle(int kII) {
 	for (int y = 0; y < sizeY; ++y) {
 		for (int x = 0; x < sizeX; ++x) {
-			CGRATiles[y][x]->execute(kII,kII);
+			CGRATiles[y][x]->execute(kII);
 		}
 	}
-
+	
 	for (int y = 0; y < sizeY; ++y) {
 		for (int x = 0; x < sizeX; ++x) {
 			CGRATiles[y][x]->updateRegisters();
 			CGRATiles[y][x]->updatePC();
 		}
 	}
+
+	//  执行一次循环将进行一次间接访存分析和依次间接访存模式匹配
+	if(kII%20==19){
+		Detect_IMA();
+		printf("RWBuffers.size=%d ",RWBuffers.size());
+		if(RWBuffers.size()!=0){
+			RWBuffers.clear();
+			bufferIdx = 0;
+		}
+		printf("RWBuffers.size=%d\n",RWBuffers.size());
+	}
+
 }
 // 
 void CGRA::dumpRawData(){

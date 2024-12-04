@@ -27,9 +27,12 @@ struct RWInfo
     AddrWD address;
 };
 //  存储捕捉到的load  store的信息  count  RWInfo
+extern struct IPT IPDentrys[100];
 extern std::map<int,RWInfo> RWBuffers;
 extern  int bufferIdx;
 
+
+int Detect_IMA();
 void print_RWBuffers();
 
 
