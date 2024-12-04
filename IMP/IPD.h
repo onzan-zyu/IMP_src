@@ -32,7 +32,8 @@ extern std::map<int,RWInfo> RWBuffers;
 extern  int bufferIdx;
 
 
-int Detect_IMA();
+int Detect_IMA_rgb();
+int Detect_IMA_src2dest();
 void print_RWBuffers();
 
 

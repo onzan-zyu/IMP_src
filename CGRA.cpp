@@ -337,14 +337,16 @@ int CGRA::executeCycle(int kII) {
 	}
 
 	//  执行一次循环将进行一次间接访存分析和依次间接访存模式匹配
-	if(kII%20==19){
-		Detect_IMA();
+	// src2dest count等于40 可识别到间接访存模式
+	if(kII%120==119){
+		Detect_IMA_rgb();
 		printf("RWBuffers.size=%d ",RWBuffers.size());
+		print_RWBuffers();
+		LOG_Buffer(LOG_INFO,"\n\n-------------------------------------one analyze cycle finished-----------------------------------------------\n\n");
 		if(RWBuffers.size()!=0){
 			RWBuffers.clear();
 			bufferIdx = 0;
 		}
-		printf("RWBuffers.size=%d\n",RWBuffers.size());
 	}
 
 }
