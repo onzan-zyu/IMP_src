@@ -1,8 +1,8 @@
 CMakeFiles/hycube_simulator_lib.dir/log.cpp.o: \
- /home/lxf/workspace/zaz/morpher/hycube_simulator/src/log.cpp \
+ /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/log.cpp \
  /usr/include/stdc-predef.h \
- /home/lxf/workspace/zaz/morpher/hycube_simulator/src/log.h \
- /home/lxf/workspace/zaz/morpher/hycube_simulator/src/opcodes.h \
+ /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/log.h \
+ /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/opcodes.h \
  /usr/local/include/c++/12.1.0/string \
  /usr/local/include/c++/12.1.0/x86_64-pc-linux-gnu/bits/c++config.h \
  /usr/local/include/c++/12.1.0/x86_64-pc-linux-gnu/bits/os_defines.h \

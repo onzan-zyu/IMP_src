@@ -1,4 +1,4 @@
-# Install script for directory: /home/lxf/workspace/zaz/morpher/hycube_simulator/src
+# Install script for directory: /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/lxf/workspace/zaz/morpher/hycube_simulator/src/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

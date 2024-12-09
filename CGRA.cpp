@@ -57,13 +57,32 @@ CGRA::CGRA(int SizeX, int SizeY,int type, int MemSize) {
 
 }
 
-void printBinary(unsigned int number) {
-    unsigned int mask = 1U << (sizeof(number) * 8 - 1);
-    for (int i = 0; i < sizeof(number) * 8; ++i) {
-        printf("%d", (number & mask) ? 1 : 0); 
-        number <<= 1; 
+// void printBinary(unsigned int number) {
+//     unsigned int mask = 1U << (sizeof(number) * 8 - 1);
+//     for (int i = 0; i < sizeof(number) * 8; ++i) {
+//         printf("%d", (number & mask) ? 1 : 0); 
+//         number <<= 1; 
+//     }
+//     printf(" constant print\n");
+// }
+void isEqual(unsigned int number,std::string binaryStr){
+	 int result = 0;
+    int length = binaryStr.length();
+
+    for (int i = 0; i < length; ++i) {
+        // 将当前字符转换为数值（'0' 或 '1'）
+        int bitValue = binaryStr[i] - '0';
+
+        // 计算当前位的权重（2的幂）
+        int power = length - 1 - i;
+
+        // 将当前位的值乘以其权重并累加到结果中
+        result += bitValue * (1 << power);
     }
-    printf("\n");
+	if(result!=number){
+		printf("str:%s number:%d\n",binaryStr,number);
+		LOG_Missmatch(LOG_INFO,"str:%s number:%d\n",binaryStr,number);
+	}
 }
 
 //所属Initial Interval 中的cycle
@@ -109,39 +128,43 @@ int CGRA::configCGRA(std::string CMEMFileName,int xdim, int ydim) {
 
 		    HyIns currIns;
 			currIns.current_cycle = t;
+			printf("instruction %d parse start\n",t);
+			printf("op=%s,NPB:%s\n",op.c_str(),op.substr(0,1).c_str());
 		    if(atoi(op.substr(0,1).c_str())==1){
 		    	currIns.NPB=true;
 		    }
 		    else{
 		    	currIns.NPB=false;
 		    }
-
+			printf("op=%s,NPB:%s\n",op.c_str(),op.substr(1,1).c_str());
 		    if(atoi(op.substr(1,1).c_str())==1){
 		    	currIns.constValid=true;
 		    }
 		    else{
 		    	currIns.constValid=false;
 		    }
-
-			currIns.constant = std::stoi(/*op.substr(46,3) +*/ op.substr(2,27+5),nullptr,2);
+			printf("constant parse %s",op.substr(2,32).c_str());
+			currIns.constant = std::stoll(/*op.substr(46,3) +*/ op.substr(2,27+5),nullptr,2);
+			printf(" constant parse success\n");
 			/////////////////////////////////////////////
-			// printf("currIns.constant=%d  binary=",currIns.constant);
-			printBinary(currIns.constant);
+			// printBinary(currIns.constant);
+			isEqual(currIns.constant,op.substr(2,32).c_str());
 			////////////////////////////////////////////
-			if((currIns.constant >> 26) == 1){ //negative number identification
-				currIns.constant = currIns.constant | 0b11111000000000000000000000000000;
-			}
+			// if((currIns.constant >> 32) == 1){ //negative number identification
+			// 	currIns.constant = currIns.constant | 0b11111000000000000000000000000000;
+			// }
 
-
+			printf("opcode=%d\n",currIns.opcode);
 			currIns.opcode = std::stoi(op.substr(29+5,5),nullptr,2);
-
+			
+			printf("regwen=%d %d %d %d\n",currIns.regwen[Reg0],currIns.regwen[Reg1],currIns.regwen[Reg2],currIns.regwen[Reg3]);
 		    currIns.regwen[Reg0] = std::stoi(op.substr(34+5,1),nullptr,2);
 		    currIns.regwen[Reg2] = std::stoi(op.substr(35+5,1),nullptr,2);
 		    currIns.regwen[Reg3] = std::stoi(op.substr(36+5,1),nullptr,2);
 		    currIns.regwen[Reg1] = std::stoi(op.substr(37+5,1),nullptr,2);
-
+			printf("tregwen=%d\n",currIns.tregwen);
 		    currIns.tregwen = std::stoi(op.substr(38+5,1),nullptr,2);
-
+			printf("regbypass=%d %d %d %d\n",currIns.regbypass[Reg0],currIns.regbypass[Reg1],currIns.regbypass[Reg2],currIns.regbypass[Reg3]);
 		    currIns.regbypass[Reg3] = std::stoi(op.substr(39+5,1),nullptr,2);
 		    currIns.regbypass[Reg0] = std::stoi(op.substr(40+5,1),nullptr,2);
 		    currIns.regbypass[Reg2] = std::stoi(op.substr(41+5,1),nullptr,2);
@@ -149,7 +172,7 @@ int CGRA::configCGRA(std::string CMEMFileName,int xdim, int ydim) {
 
 		    LOG(SIMULATOR) << "XbConfig : " << op.substr(43+5,21) << "\n";
 		    LOG(SIMULATOR) << "xB.I2 : " << op.substr(49+5,3) << "\n";
-
+			printf("currIns.xB.P\n");
 		    currIns.xB.P = convertStrtoXBI(op.substr(43+5,3));
 
 //		    if(currIns.constValid){
@@ -159,11 +182,12 @@ int CGRA::configCGRA(std::string CMEMFileName,int xdim, int ydim) {
 		    	currIns.xB.I2 = convertStrtoXBI(op.substr(46+5,3));
 //		    }
 		    currIns.xB.I1 = convertStrtoXBI(op.substr(49+5,3));
+			printf("NWSE_O\n");
 		    currIns.xB.NORTH_O = convertStrtoXBI(op.substr(52+5,3));
 		    currIns.xB.WEST_O = convertStrtoXBI(op.substr(55+5,3));
 		    currIns.xB.SOUTH_O = convertStrtoXBI(op.substr(58+5,3));
 		    currIns.xB.EAST_O = convertStrtoXBI(op.substr(61+5,3));
-
+			printf("instruction %d parse finished\n",t);
 		    CGRATiles[y][x]->printIns(currIns);
 
 		    CGRATiles[y][x]->configMem.push_back(currIns);
@@ -339,7 +363,7 @@ int CGRA::executeCycle(int kII) {
 	//  执行一次循环将进行一次间接访存分析和依次间接访存模式匹配
 	// src2dest count等于40 可识别到间接访存模式
 	if(kII%120==119){
-		Detect_IMA_rgb();
+		Detect_IMA_src2dest();
 		printf("RWBuffers.size=%d ",RWBuffers.size());
 		print_RWBuffers();
 		LOG_Buffer(LOG_INFO,"\n\n-------------------------------------one analyze cycle finished-----------------------------------------------\n\n");
@@ -376,6 +400,8 @@ void CGRA::printInterestedAddrOutcome() {
 			correct_count++;
 		}else{
 			wrong_count++;
+			LOG_Missmatch(LOG_INFO,"Data mismatch at address: %d result:%d ,expected:%d\n",addr,(int)dmem[addr],(int)dmem_post[addr]);
+			// printf("Data mismatch at address: %d result:%d ,expected:%d\n",addr,(int)dmem[addr],(int)dmem_post[addr]);
 			LOG(SIMULATOR) << "Data mismatch at address: "<< addr << ", result:" << (int)dmem[addr]<<", expected:" << (int)dmem_post[addr] << "\n";
 		}
 	}
@@ -389,7 +415,7 @@ void CGRA::printInterestedAddrOutcome() {
 XBarInput CGRA::convertStrtoXBI(std::string str) {
 
 	LOG(SIMULATOR) << "convertStr called : " << std::stoi(str,nullptr,2) << "\n";
-
+	printf("stoi:%s\n",str.c_str());
 	switch(std::stoi(str,nullptr,2)){
 		case 0:
 			return EAST_I;
