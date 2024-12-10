@@ -41,10 +41,10 @@ namespace HyCUBESim {
 		LOG_TXT(LOG_INFO, "current cycle=%d op=%s PC=%d,LSR=%d,LER=%d,kII=%d,X=%d,Y=%d",currIns.current_cycle, opstr.c_str(),PC,LSR,LER ,kII,X,Y);
 		LOG(SIMULATOR) << "currIns ::\n";
 		printIns(currIns);
-		if(currIns.current_cycle < prev_cycle){   // cycle达到最大II之后 会回到0 执行完一个循环
-			RWBuffers[bufferIdx++] = {-1,true,0,0};
-		}
-		prev_cycle = currIns.current_cycle;
+		// if(currIns.current_cycle < prev_cycle){   // cycle达到最大II之后 会回到0 执行完一个循环
+		// 	RWBuffers[bufferIdx++] = {-1,true,0,0};
+		// }
+		// prev_cycle = currIns.current_cycle;
 		DataType result;
 
 		bool predicate;
@@ -228,18 +228,18 @@ namespace HyCUBESim {
 			case LOAD :
 				LOG(SIMULATOR) << ": LOAD," << operand1 << "," << operand2 << "\n";
 #ifdef ARCHI_16BIT
-				ALUTempOut = load(operand2,2,currIns.current_cycle);
+				ALUTempOut = load(operand2,2,currIns.current_cycle,kII);
 #else
-				ALUTempOut = load(operand2,4,currIns.current_cycle);
+				ALUTempOut = load(operand2,4,currIns.current_cycle,kII); //  current_cycle指配置指令的current——cycle
 #endif
 				break;
 			case LOADH :
 				LOG(SIMULATOR) << ": LOADH," << operand1 << "," << operand2 << "\n";
-				ALUTempOut = load(operand2,2,currIns.current_cycle);
+				ALUTempOut = load(operand2,2,currIns.current_cycle,kII);
 				break;
 			case LOADB :
 				LOG(SIMULATOR) << ": LOADB," << operand1 << "," << operand2 << "\n";
-				ALUTempOut = load(operand2,1,currIns.current_cycle);
+				ALUTempOut = load(operand2,1,currIns.current_cycle,kII);
 				break;
 			case STORE :
 				LOG(SIMULATOR) << ": STORE," << operand1 << "," << operand2 << "\n";
@@ -913,7 +913,7 @@ namespace HyCUBESim {
 		return op1;
 	}
 	// cycle是config memory在映射上的cycle
-	DataType CGRATile::load(DataType op2, int size,int cycle) {
+	DataType CGRATile::load(DataType op2, int size,int cycle,int count) {
 		// printf("load X=%d,Y=%d,current cycle=%d,address:%d",this->X ,this->Y,cycle,op2);
 		assert(size == 1 || size == 2 || size == 4);
 		
@@ -932,7 +932,7 @@ namespace HyCUBESim {
 		// printf(" load data=%d\n",res);
 		//loopstart 和loop end的读入过滤
 		if(op2!=this->CGRA_MEMSIZE-2 && op2!=(this->CGRA_MEMSIZE-2)/2){
-			RWBuffers[bufferIdx++] = {(uint8_t)cycle,true,res,op2};
+			RWBuffers[bufferIdx++] = {(uint8_t)cycle,true,res,op2,false,count};
 		}
 		
 		LOG_load_store(LOG_INFO,"load X=%d,Y=%d,current cycle=%d,address:%d,size:%d,load data =%d\n",this->X ,this->Y,cycle,op2,size,res);
@@ -943,7 +943,7 @@ namespace HyCUBESim {
 		// printf("X=%d,Y=%d,current cycle=%d,store address:%d,store data=%d\n",this->X ,this->Y,cycle,op2,op1);
 		LOG_load_store(LOG_INFO,"store X=%d,Y=%d,current cycle=%d,address:%d size=%d store data=%d",this->X ,this->Y,cycle,op2,size,op1);
 		if(op2!=this->CGRA_MEMSIZE-2 && op2!=(this->CGRA_MEMSIZE-2)/2){
-			RWBuffers[bufferIdx++] = {(uint8_t)cycle,false,op1,op2};
+			RWBuffers[bufferIdx++] = {(uint8_t)cycle,false,op1,op2,false,-1};
 		}
 		assert(size == 1 || size == 2 || size == 4);
 		DataType res = 0;

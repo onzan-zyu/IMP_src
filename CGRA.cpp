@@ -95,7 +95,7 @@ int CGRA::configCGRA(std::string CMEMFileName,int xdim, int ydim) {
 
 	//ignoring the first line
 	std::getline(cmemfile,line);
-
+	int t;
 	while(1){
 		if(!std::getline(cmemfile,line)){
 			break;
@@ -106,7 +106,7 @@ int CGRA::configCGRA(std::string CMEMFileName,int xdim, int ydim) {
 		}
 
 	    std::istringstream iss(line);
-	    int t;
+	    
 
 	    iss >> t;   // cycle   增加每个配置所属的cycle
 		// printf("read cycle:%d\n",t);
@@ -128,24 +128,24 @@ int CGRA::configCGRA(std::string CMEMFileName,int xdim, int ydim) {
 
 		    HyIns currIns;
 			currIns.current_cycle = t;
-			printf("instruction %d parse start\n",t);
-			printf("op=%s,NPB:%s\n",op.c_str(),op.substr(0,1).c_str());
+			// printf("instruction %d parse start\n",t);
+			// printf("op=%s,NPB:%s\n",op.c_str(),op.substr(0,1).c_str());
 		    if(atoi(op.substr(0,1).c_str())==1){
 		    	currIns.NPB=true;
 		    }
 		    else{
 		    	currIns.NPB=false;
 		    }
-			printf("op=%s,NPB:%s\n",op.c_str(),op.substr(1,1).c_str());
+			// printf("op=%s,NPB:%s\n",op.c_str(),op.substr(1,1).c_str());
 		    if(atoi(op.substr(1,1).c_str())==1){
 		    	currIns.constValid=true;
 		    }
 		    else{
 		    	currIns.constValid=false;
 		    }
-			printf("constant parse %s",op.substr(2,32).c_str());
+			// printf("constant parse %s",op.substr(2,32).c_str());
 			currIns.constant = std::stoll(/*op.substr(46,3) +*/ op.substr(2,27+5),nullptr,2);
-			printf(" constant parse success\n");
+			// printf(" constant parse success\n");
 			/////////////////////////////////////////////
 			// printBinary(currIns.constant);
 			isEqual(currIns.constant,op.substr(2,32).c_str());
@@ -154,17 +154,17 @@ int CGRA::configCGRA(std::string CMEMFileName,int xdim, int ydim) {
 			// 	currIns.constant = currIns.constant | 0b11111000000000000000000000000000;
 			// }
 
-			printf("opcode=%d\n",currIns.opcode);
+			// printf("opcode=%d\n",currIns.opcode);
 			currIns.opcode = std::stoi(op.substr(29+5,5),nullptr,2);
 			
-			printf("regwen=%d %d %d %d\n",currIns.regwen[Reg0],currIns.regwen[Reg1],currIns.regwen[Reg2],currIns.regwen[Reg3]);
+			// printf("regwen=%d %d %d %d\n",currIns.regwen[Reg0],currIns.regwen[Reg1],currIns.regwen[Reg2],currIns.regwen[Reg3]);
 		    currIns.regwen[Reg0] = std::stoi(op.substr(34+5,1),nullptr,2);
 		    currIns.regwen[Reg2] = std::stoi(op.substr(35+5,1),nullptr,2);
 		    currIns.regwen[Reg3] = std::stoi(op.substr(36+5,1),nullptr,2);
 		    currIns.regwen[Reg1] = std::stoi(op.substr(37+5,1),nullptr,2);
-			printf("tregwen=%d\n",currIns.tregwen);
+			// printf("tregwen=%d\n",currIns.tregwen);
 		    currIns.tregwen = std::stoi(op.substr(38+5,1),nullptr,2);
-			printf("regbypass=%d %d %d %d\n",currIns.regbypass[Reg0],currIns.regbypass[Reg1],currIns.regbypass[Reg2],currIns.regbypass[Reg3]);
+			// printf("regbypass=%d %d %d %d\n",currIns.regbypass[Reg0],currIns.regbypass[Reg1],currIns.regbypass[Reg2],currIns.regbypass[Reg3]);
 		    currIns.regbypass[Reg3] = std::stoi(op.substr(39+5,1),nullptr,2);
 		    currIns.regbypass[Reg0] = std::stoi(op.substr(40+5,1),nullptr,2);
 		    currIns.regbypass[Reg2] = std::stoi(op.substr(41+5,1),nullptr,2);
@@ -172,7 +172,7 @@ int CGRA::configCGRA(std::string CMEMFileName,int xdim, int ydim) {
 
 		    LOG(SIMULATOR) << "XbConfig : " << op.substr(43+5,21) << "\n";
 		    LOG(SIMULATOR) << "xB.I2 : " << op.substr(49+5,3) << "\n";
-			printf("currIns.xB.P\n");
+			// printf("currIns.xB.P\n");
 		    currIns.xB.P = convertStrtoXBI(op.substr(43+5,3));
 
 //		    if(currIns.constValid){
@@ -182,12 +182,12 @@ int CGRA::configCGRA(std::string CMEMFileName,int xdim, int ydim) {
 		    	currIns.xB.I2 = convertStrtoXBI(op.substr(46+5,3));
 //		    }
 		    currIns.xB.I1 = convertStrtoXBI(op.substr(49+5,3));
-			printf("NWSE_O\n");
+			// printf("NWSE_O\n");
 		    currIns.xB.NORTH_O = convertStrtoXBI(op.substr(52+5,3));
 		    currIns.xB.WEST_O = convertStrtoXBI(op.substr(55+5,3));
 		    currIns.xB.SOUTH_O = convertStrtoXBI(op.substr(58+5,3));
 		    currIns.xB.EAST_O = convertStrtoXBI(op.substr(61+5,3));
-			printf("instruction %d parse finished\n",t);
+			// printf("instruction %d parse finished\n",t);
 		    CGRATiles[y][x]->printIns(currIns);
 
 		    CGRATiles[y][x]->configMem.push_back(currIns);
@@ -197,6 +197,7 @@ int CGRA::configCGRA(std::string CMEMFileName,int xdim, int ydim) {
 		}
 	    std::getline(cmemfile,line);
 	}
+	InitialInterval = t+1;
 	cmemfile.close();
 }
 
@@ -363,8 +364,13 @@ int CGRA::executeCycle(int kII) {
 	//  执行一次循环将进行一次间接访存分析和依次间接访存模式匹配
 	// src2dest count等于40 可识别到间接访存模式
 	if(kII%120==119){
-		Detect_IMA_src2dest();
-		printf("RWBuffers.size=%d ",RWBuffers.size());
+		// Detect_IMA_src2dest();
+		Detect_IMA_SPVM();
+		// printf("RWBuffers.size=%d ",RWBuffers.size());
+		// for(const auto& pair : RWBuffers){
+		// 	IPDentrys[IPD_index++];
+		// }
+		
 		print_RWBuffers();
 		LOG_Buffer(LOG_INFO,"\n\n-------------------------------------one analyze cycle finished-----------------------------------------------\n\n");
 		if(RWBuffers.size()!=0){
