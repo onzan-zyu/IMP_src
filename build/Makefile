@@ -142,137 +142,95 @@ hycube_simulator/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/build
 .PHONY : hycube_simulator/fast
 
-CGRA.o: CGRA.cpp.o
+# target to build an object file
+CGRA.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/CGRA.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/CGRA.o
 .PHONY : CGRA.o
 
-# target to build an object file
-CGRA.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/CGRA.cpp.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/CGRA.cpp.o
-.PHONY : CGRA.cpp.o
-
-CGRA.i: CGRA.cpp.i
+# target to preprocess a source file
+CGRA.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/CGRA.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/CGRA.i
 .PHONY : CGRA.i
 
-# target to preprocess a source file
-CGRA.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/CGRA.cpp.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/CGRA.cpp.i
-.PHONY : CGRA.cpp.i
-
-CGRA.s: CGRA.cpp.s
+# target to generate assembly for a file
+CGRA.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/CGRA.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/CGRA.s
 .PHONY : CGRA.s
 
-# target to generate assembly for a file
-CGRA.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/CGRA.cpp.s
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/CGRA.cpp.s
-.PHONY : CGRA.cpp.s
-
-CGRATile.o: CGRATile.cpp.o
+# target to build an object file
+CGRATile.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/CGRATile.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/CGRATile.o
 .PHONY : CGRATile.o
 
-# target to build an object file
-CGRATile.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/CGRATile.cpp.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/CGRATile.cpp.o
-.PHONY : CGRATile.cpp.o
-
-CGRATile.i: CGRATile.cpp.i
+# target to preprocess a source file
+CGRATile.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/CGRATile.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/CGRATile.i
 .PHONY : CGRATile.i
 
-# target to preprocess a source file
-CGRATile.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/CGRATile.cpp.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/CGRATile.cpp.i
-.PHONY : CGRATile.cpp.i
-
-CGRATile.s: CGRATile.cpp.s
+# target to generate assembly for a file
+CGRATile.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/CGRATile.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/CGRATile.s
 .PHONY : CGRATile.s
 
-# target to generate assembly for a file
-CGRATile.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/CGRATile.cpp.s
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/CGRATile.cpp.s
-.PHONY : CGRATile.cpp.s
-
-IMP/IPD.o: IMP/IPD.cpp.o
+# target to build an object file
+IMP/IPD.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/IMP/IPD.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/IMP/IPD.o
 .PHONY : IMP/IPD.o
 
-# target to build an object file
-IMP/IPD.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/IMP/IPD.cpp.o
-.PHONY : IMP/IPD.cpp.o
-
-IMP/IPD.i: IMP/IPD.cpp.i
+# target to preprocess a source file
+IMP/IPD.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/IMP/IPD.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/IMP/IPD.i
 .PHONY : IMP/IPD.i
 
-# target to preprocess a source file
-IMP/IPD.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/IMP/IPD.cpp.i
-.PHONY : IMP/IPD.cpp.i
-
-IMP/IPD.s: IMP/IPD.cpp.s
+# target to generate assembly for a file
+IMP/IPD.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/IMP/IPD.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/IMP/IPD.s
 .PHONY : IMP/IPD.s
 
-# target to generate assembly for a file
-IMP/IPD.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/IMP/IPD.cpp.s
-.PHONY : IMP/IPD.cpp.s
-
-hycube_sim.o: hycube_sim.cpp.o
+# target to build an object file
+hycube_sim.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/hycube_sim.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/hycube_sim.o
 .PHONY : hycube_sim.o
 
-# target to build an object file
-hycube_sim.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/hycube_sim.cpp.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/hycube_sim.cpp.o
-.PHONY : hycube_sim.cpp.o
-
-hycube_sim.i: hycube_sim.cpp.i
+# target to preprocess a source file
+hycube_sim.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/hycube_sim.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/hycube_sim.i
 .PHONY : hycube_sim.i
 
-# target to preprocess a source file
-hycube_sim.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/hycube_sim.cpp.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/hycube_sim.cpp.i
-.PHONY : hycube_sim.cpp.i
-
-hycube_sim.s: hycube_sim.cpp.s
+# target to generate assembly for a file
+hycube_sim.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/hycube_sim.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/hycube_sim.s
 .PHONY : hycube_sim.s
 
-# target to generate assembly for a file
-hycube_sim.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/hycube_sim.cpp.s
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/hycube_sim.cpp.s
-.PHONY : hycube_sim.cpp.s
-
-log.o: log.cpp.o
+# target to build an object file
+log.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/log.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/log.o
 .PHONY : log.o
 
-# target to build an object file
-log.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/log.cpp.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/log.cpp.o
-.PHONY : log.cpp.o
-
-log.i: log.cpp.i
+# target to preprocess a source file
+log.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/log.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/log.i
 .PHONY : log.i
 
-# target to preprocess a source file
-log.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/log.cpp.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/log.cpp.i
-.PHONY : log.cpp.i
-
-log.s: log.cpp.s
-.PHONY : log.s
-
 # target to generate assembly for a file
-log.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/log.cpp.s
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/log.cpp.s
-.PHONY : log.cpp.s
+log.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/log.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/log.s
+.PHONY : log.s
 
 # Help Target
 help:

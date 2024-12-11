@@ -334,7 +334,7 @@ void CGRA::invokeCGRA(HyCUBESim::CGRA& cgraInstance) {
 #else
     while (cgraInstance.dmem[MEM_SIZE / 2 - 1] == 0) {
         cgraInstance.executeCycle(count);
-		LOG_TXT(LOG_INFO,"count=%d\n",count);
+		// LOG_TXT(LOG_INFO,"count=%d\n",count);
         count++;
     }
 #endif
@@ -342,7 +342,7 @@ void CGRA::invokeCGRA(HyCUBESim::CGRA& cgraInstance) {
     // 20 cycles for epilogue
     for (int i = 0; i < 20; i++) {
         cgraInstance.executeCycle(count);
-		LOG_TXT(LOG_INFO,"count=%d\n",count);
+		// LOG_TXT(LOG_INFO,"count=%d\n",count);
         count++;
     }
 }
@@ -365,7 +365,22 @@ int CGRA::executeCycle(int kII) {
 	// src2dest count等于40 可识别到间接访存模式
 	if(kII%120==119){
 		// Detect_IMA_src2dest();
-		Detect_IMA_SPVM();
+		Index_array_Detect();
+		if(IPDentrys.size()){
+			classify_array();
+			//kII传入的是当前的count  用于移除与当前count相差较远且hit次数少的pattern
+			valid_IPDEntry(index_array,target_addr,kII);
+			if(index_array.size()){
+				index_array.clear();
+			}
+			if(target_addr.size()){
+				target_addr.clear();
+			}
+		}
+		else{
+			Detect_IMA_SPVM();
+		}
+		
 		// printf("RWBuffers.size=%d ",RWBuffers.size());
 		// for(const auto& pair : RWBuffers){
 		// 	IPDentrys[IPD_index++];
@@ -377,6 +392,7 @@ int CGRA::executeCycle(int kII) {
 			RWBuffers.clear();
 			bufferIdx = 0;
 		}
+		
 	}
 
 }
@@ -421,7 +437,7 @@ void CGRA::printInterestedAddrOutcome() {
 XBarInput CGRA::convertStrtoXBI(std::string str) {
 
 	LOG(SIMULATOR) << "convertStr called : " << std::stoi(str,nullptr,2) << "\n";
-	printf("stoi:%s\n",str.c_str());
+	// printf("stoi:%s\n",str.c_str());
 	switch(std::stoi(str,nullptr,2)){
 		case 0:
 			return EAST_I;

@@ -4,7 +4,7 @@
  *  Created on: 6 Mar 2017
  *      Author: manupa
  */
-#include<string>
+
 #ifndef OPCODES_H_
 #define OPCODES_H_
 
@@ -40,5 +40,5 @@
 #define STOREB 29
 #define JUMPL 30
 #define MOVC 31
-std::string  opcodeStr(uint8_t code);
+
 #endif /* OPCODES_H_ */

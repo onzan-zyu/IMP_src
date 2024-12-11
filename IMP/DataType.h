@@ -1,10 +1,10 @@
 //
-// Created by onzan_zyu on 2024/12/2.
+// Created by onzan_zyu on 2024/11/27.
 //
-#include<stdint.h>
+
 #ifndef DATATYPE_H
 #define DATATYPE_H
-
+#include<stdint.h>
 #define AddrWD uint32_t
 #define CycleWD uint64_t
 // AddrWD spmStart;

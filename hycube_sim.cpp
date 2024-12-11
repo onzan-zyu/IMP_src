@@ -13,9 +13,9 @@ using namespace std;
 #include <unistd.h>
 #include <string.h>
 #include "debug.h"
-// #include "IMP/IPD.h"
+
 //Uncomment this for 16-bit full chip
-//#define ARCHI_16BIT
+// #define ARCHI_16BIT
 struct arguments
 {
 	string cmemfileName;
@@ -43,13 +43,13 @@ arguments parse_arguments(int argc, char *argv[])
 		switch (c)
 		{
 		case 'c':
-			ret.cmemfileName = string(optarg);//*.bin 
+			ret.cmemfileName = string(optarg);
 			break;
 		case 'd':
-			ret.dmemfileName = string(optarg);// kernel_trace_0.txt
+			ret.dmemfileName = string(optarg);
 			break;
 		case 'a':
-			ret.memallocfileName = string(optarg);// kernel_mem_alloc.txt
+			ret.memallocfileName = string(optarg);
 			break;
 		case 'm':
 			ret.MEM_SIZE = atoi(optarg);
@@ -79,7 +79,7 @@ arguments parse_arguments(int argc, char *argv[])
 }
 
 //int MEM_SIZE = 4096;
-// argument count   argument vector 
+
 int main(int argc, char* argv[]) {
 
 	if(argc < 3){
@@ -88,9 +88,9 @@ int main(int argc, char* argv[]) {
 	}
 
 	arguments args = parse_arguments(argc,argv);
-	string cmemfileName = args.cmemfileName;// *.bin
-	string dmemfileName = args.dmemfileName;// kernel_trace_0.txt
-	string memallocfileName = args.memallocfileName;// kernel_mem_alloc.txt
+	string cmemfileName = args.cmemfileName;
+	string dmemfileName = args.dmemfileName;
+	string memallocfileName = args.memallocfileName;
 	int MEM_SIZE = args.MEM_SIZE;
 	int xdim = args.xdim;
 	int ydim = args.ydim;
@@ -116,32 +116,31 @@ int main(int argc, char* argv[]) {
 	//cgraInstance.printInterestedAddrOutcome();
 
 	int count=0;
-	printf("start executeCycle\n");
 	#ifdef ARCHI_16BIT
 		cout << "XXX->" << cgraInstance.dmem[MEM_SIZE-2] << " " << MEM_SIZE-2 << "\n";
-		while(cgraInstance.dmem[MEM_SIZE-2]==0){ 
+		while(cgraInstance.dmem[MEM_SIZE-2]==0){
 			cout << "XXX->" << cgraInstance.dmem[MEM_SIZE-2] << "\n";
 			cgraInstance.executeCycle(count);
 			count++;
 		}
 	#else
-		while(cgraInstance.dmem[MEM_SIZE/2-1]==0){//loopEnd变为1之前 表示没有结束
-			cgraInstance.executeCycle(count);
-			// printf("count=%d\n",count);
-			count++;
-		}
+	while(cgraInstance.dmem[MEM_SIZE/2-1]==0){   //  当第一个banksize  最后一位不为0的时候 执行结束
+		cgraInstance.executeCycle(count);
+		count++;
+	}
 
-	#endif
+	cgraInstance.setTotalCycles(count);
+
+#endif
 	//20 cycles for epilogue
 	for(int i = 0; i < 20;i++){
 		cgraInstance.executeCycle(count);
 		count++;
 	}
-
-
+	print_IPD();
 	cgraInstance.printInterestedAddrOutcome();
 
-
+	// cgraInstance.dumpStat();
 	//cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
 	return 0;
 }

@@ -10,9 +10,11 @@
 
 #include "data_structures.h"
 #include "CGRATile.h"
-#include <fstream>
-#include "debug.h"
 #include "IMP/IPD.h"
+#include <fstream>
+#include <map>
+#include <string>
+#include "debug.h"
 
 
 //Uncomment this for 16-bit full chip
@@ -20,7 +22,11 @@
 
 namespace HyCUBESim {
 
+class CGRATile;
+
 class CGRA {
+
+	friend class CGRATile;
 
 	public:
 		CGRA(int SizeX, int SizeY, int type, int MEM_SIZE);
@@ -40,16 +46,29 @@ class CGRA {
 		
 		void printInterestedAddrOutcome();
 		void dumpRawData();
+		void setTotalCycles(int tc){ total_cgra_cycles = tc;}
+		// void dumpStat();
 
 
 	private:
 
 		int sizeX;
 		int sizeY;
-		int MEM_SIZE;
-		uint64_t *cycle;
+		int MEM_SIZE;//  SPM的存储大小
+		
 		std::vector<int> InterestedAddrList;
 		XBarInput convertStrtoXBI(std::string str);
+
+		//cgra execution statistics
+		std::map<std::string, std::pair<int,int>> spm_allocation;
+		//SPM read
+		std::vector<int> spm_read_count;
+		//SPM write
+		std::vector<int> spm_write_count;
+
+		int total_cgra_cycles = 0;
+		int cgra_frequnecy = 100; //MHz
+		int spi_frequnecy = 284; //MHz
 
 	};
 

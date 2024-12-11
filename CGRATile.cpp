@@ -38,7 +38,7 @@ namespace HyCUBESim {
 
 		HyIns currIns = configMem[PC];
 		std::string opstr  = opcodeStr(currIns.opcode);
-		LOG_TXT(LOG_INFO, "current cycle=%d op=%s PC=%d,LSR=%d,LER=%d,kII=%d,X=%d,Y=%d",currIns.current_cycle, opstr.c_str(),PC,LSR,LER ,kII,X,Y);
+		// LOG_TXT(LOG_INFO, "current cycle=%d op=%s PC=%d,LSR=%d,LER=%d,kII=%d,X=%d,Y=%d",currIns.current_cycle, opstr.c_str(),PC,LSR,LER ,kII,X,Y);
 		LOG(SIMULATOR) << "currIns ::\n";
 		printIns(currIns);
 		// if(currIns.current_cycle < prev_cycle){   // cycle达到最大II之后 会回到0 执行完一个循环
@@ -935,13 +935,13 @@ namespace HyCUBESim {
 			RWBuffers[bufferIdx++] = {(uint8_t)cycle,true,res,op2,false,count};
 		}
 		
-		LOG_load_store(LOG_INFO,"load X=%d,Y=%d,current cycle=%d,address:%d,size:%d,load data =%d\n",this->X ,this->Y,cycle,op2,size,res);
+		// LOG_load_store(LOG_INFO,"load X=%d,Y=%d,current cycle=%d,address:%d,size:%d,load data =%d\n",this->X ,this->Y,cycle,op2,size,res);
 		return res;
 	}
 
 	DataType CGRATile::store(DataType op1, DataType op2, int size,int cycle) {
 		// printf("X=%d,Y=%d,current cycle=%d,store address:%d,store data=%d\n",this->X ,this->Y,cycle,op2,op1);
-		LOG_load_store(LOG_INFO,"store X=%d,Y=%d,current cycle=%d,address:%d size=%d store data=%d",this->X ,this->Y,cycle,op2,size,op1);
+		// LOG_load_store(LOG_INFO,"store X=%d,Y=%d,current cycle=%d,address:%d size=%d store data=%d",this->X ,this->Y,cycle,op2,size,op1);
 		if(op2!=this->CGRA_MEMSIZE-2 && op2!=(this->CGRA_MEMSIZE-2)/2){
 			RWBuffers[bufferIdx++] = {(uint8_t)cycle,false,op1,op2,false,-1};
 		}
@@ -1283,5 +1283,4 @@ namespace HyCUBESim {
 
 
 } /* namespace HyCUBESim */
-
 
