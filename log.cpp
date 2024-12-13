@@ -12,7 +12,7 @@ void log_messages(LogLevel level, const char *file, int line, const char *format
     char timeBuffer[26];
     strftime(timeBuffer, 26, "%Y-%m-%d %H", localtime(&now));
     char logFileName[50];
-    snprintf(logFileName, sizeof(logFileName), "log_%s.txt", timeBuffer);
+    snprintf(logFileName, sizeof(logFileName), "./log/message_%s.txt", timeBuffer);
     FILE *logFile = fopen(logFileName, "a");
     if (logFile == NULL) {
         perror("Failed to open log file");
@@ -31,9 +31,9 @@ void log_messages(LogLevel level, const char *file, int line, const char *format
     va_list args;
     va_start(args, format);
     // fprintf(logFile, "[%s] %s (%s:%d): ", level_str, timeBuffer, file, line);
-    fprintf(logFile, "(%s:%d): ",  file, line);
+    fprintf(logFile, "(%d): ", line);
     vfprintf(logFile, format, args);
-    fprintf(logFile, "\n");
+    // fprintf(logFile, "\n");
     va_end(args);
 
     fclose(logFile);
@@ -44,7 +44,7 @@ void log_address(LogLevel level, const char *file, int line, const char *format,
     char timeBuffer[26];
     strftime(timeBuffer, 26, "%Y-%m-%d %H", localtime(&now));
     char logFileName[50];
-    snprintf(logFileName, sizeof(logFileName), "log_address_%s.txt", timeBuffer);
+    snprintf(logFileName, sizeof(logFileName), "./log/log_address_%s.txt", timeBuffer);
     FILE *logFile = fopen(logFileName, "a");
     if (logFile == NULL) {
         perror("Failed to open log file");
@@ -114,7 +114,7 @@ void log_buffer(LogLevel level, const char *file, int line, const char *format, 
     char timeBuffer[26];
     strftime(timeBuffer, 26, "%Y-%m-%d %H", localtime(&now));
     char logFileName[50];
-    snprintf(logFileName, sizeof(logFileName), "Buffer_log_%s.txt", timeBuffer);
+    snprintf(logFileName, sizeof(logFileName), "./log/Buffer_log_%s.txt", timeBuffer);
     FILE *logFile = fopen(logFileName, "a");
     if (logFile == NULL) {
         perror("Failed to open log file");
@@ -148,7 +148,7 @@ void log_IMA(LogLevel level, const char *file, int line, const char *format, ...
     char timeBuffer[26];
     strftime(timeBuffer, 26, "%Y-%m-%d %H", localtime(&now));
     char logFileName[50];
-    snprintf(logFileName, sizeof(logFileName), "IMA_log_%s.txt", timeBuffer);
+    snprintf(logFileName, sizeof(logFileName), "./log/IMA_log_%s.txt", timeBuffer);
     FILE *logFile = fopen(logFileName, "a");
     if (logFile == NULL) {
         perror("Failed to open log file");
@@ -170,7 +170,7 @@ void log_IMA(LogLevel level, const char *file, int line, const char *format, ...
     fprintf(logFile, "(%d): ", line);
     // fprintf(logFile, "(%s:%d): ",  file, line);
     vfprintf(logFile, format, args);
-    fprintf(logFile, "\n");
+    // fprintf(logFile, "\n");
     va_end(args);
 
     fclose(logFile);
@@ -183,7 +183,7 @@ void log_calculate(LogLevel level, const char *file, int line, const char *forma
     char timeBuffer[26];
     strftime(timeBuffer, 26, "%Y-%m-%d %H", localtime(&now));
     char logFileName[50];
-    snprintf(logFileName, sizeof(logFileName), "calculate_log_%s.txt", timeBuffer);
+    snprintf(logFileName, sizeof(logFileName), "./log/calculate_log_%s.txt", timeBuffer);
     FILE *logFile = fopen(logFileName, "a");
     if (logFile == NULL) {
         perror("Failed to open log file");
@@ -205,7 +205,7 @@ void log_calculate(LogLevel level, const char *file, int line, const char *forma
     fprintf(logFile, "(%d): ", line);
     // fprintf(logFile, "(%s:%d): ",  file, line);
     vfprintf(logFile, format, args);
-    fprintf(logFile, "\n");
+    // fprintf(logFile, "\n");
     va_end(args);
 
     fclose(logFile);
@@ -216,7 +216,7 @@ void log_IndexArray(LogLevel level, const char *file, int line, const char *form
     char timeBuffer[26];
     strftime(timeBuffer, 26, "%Y-%m-%d %H", localtime(&now));
     char logFileName[50];
-    snprintf(logFileName, sizeof(logFileName), "IndexArray_log_%s.txt", timeBuffer);
+    snprintf(logFileName, sizeof(logFileName), "./log/IndexArray_log_%s.txt", timeBuffer);
     FILE *logFile = fopen(logFileName, "a");
     if (logFile == NULL) {
         perror("Failed to open log file");
@@ -238,7 +238,7 @@ void log_IndexArray(LogLevel level, const char *file, int line, const char *form
     fprintf(logFile, "(%d): ", line);
     // fprintf(logFile, "(%s:%d): ",  file, line);
     vfprintf(logFile, format, args);
-    fprintf(logFile, "\n");
+    // fprintf(logFile, "\n");
     va_end(args);
 
     fclose(logFile);
@@ -250,7 +250,7 @@ void log_IPDentry(LogLevel level, const char *file, int line, const char *format
     char timeBuffer[26];
     strftime(timeBuffer, 26, "%Y-%m-%d %H", localtime(&now));
     char logFileName[50];
-    snprintf(logFileName, sizeof(logFileName), "IPDentry_log_%s.txt", timeBuffer);
+    snprintf(logFileName, sizeof(logFileName), "./log/IPDentry_log_%s.txt", timeBuffer);
     FILE *logFile = fopen(logFileName, "a");
     if (logFile == NULL) {
         perror("Failed to open log file");
@@ -272,13 +272,45 @@ void log_IPDentry(LogLevel level, const char *file, int line, const char *format
     fprintf(logFile, "(%d): ", line);
     // fprintf(logFile, "(%s:%d): ",  file, line);
     vfprintf(logFile, format, args);
-    fprintf(logFile, "\n");
+    // fprintf(logFile, "\n");
     va_end(args);
 
     fclose(logFile);
 }   
 
+void log_validate_hit(LogLevel level, const char *file, int line, const char *format, ...){
+    // 获取当前时间
+    time_t now = time(NULL);
+    char timeBuffer[26];
+    strftime(timeBuffer, 26, "%Y-%m-%d %H", localtime(&now));
+    char logFileName[50];
+    snprintf(logFileName, sizeof(logFileName), "./log/IPD_hit_log_%s.txt", timeBuffer);
+    FILE *logFile = fopen(logFileName, "a");
+    if (logFile == NULL) {
+        perror("Failed to open log file");
+        return;
+    }
+    // 根据日志级别添加前缀
+    const char *level_str;
+    switch (level) {
+        case LOG_INFO:   level_str = "INFO"; break;
+        case LOG_WARNING: level_str = "WARNING"; break;
+        case LOG_ERROR:  level_str = "ERROR"; break;
+        default:         level_str = "UNKNOWN"; break;
+    }
 
+    // 写入日志信息
+    va_list args;
+    va_start(args, format);
+    // fprintf(logFile, "[%s] %s (%s:%d): ", level_str, timeBuffer, file, line);
+    fprintf(logFile, "(%d): ", line);
+    // fprintf(logFile, "(%s:%d): ",  file, line);
+    vfprintf(logFile, format, args);
+    // fprintf(logFile, "\n");
+    va_end(args);
+
+    fclose(logFile);
+} 
 
 void log_missmatch(LogLevel level, const char *file, int line, const char *format, ...){
     // 获取当前时间
@@ -286,7 +318,7 @@ void log_missmatch(LogLevel level, const char *file, int line, const char *forma
     char timeBuffer[26];
     strftime(timeBuffer, 26, "%Y-%m-%d %H", localtime(&now));
     char logFileName[50];
-    snprintf(logFileName, sizeof(logFileName), "missmatch_log_%s.txt", timeBuffer);
+    snprintf(logFileName, sizeof(logFileName), "./log/missmatch_log_%s.txt", timeBuffer);
     FILE *logFile = fopen(logFileName, "a");
     if (logFile == NULL) {
         perror("Failed to open log file");

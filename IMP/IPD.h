@@ -8,6 +8,7 @@
 #include "DataType.h"
 #include "../data_structures.h"
 #include "../log.h"
+#include <math.h>
 #include <stdarg.h> // 添加对可变参数的支持
 // 存储间接访存模式的特征
 struct IPT
@@ -43,13 +44,12 @@ struct Valid_Idx{
 };
 
 
-
+extern bool IPDEnable;
 extern int InitialInterval;
 //  存储捕捉到的load  store的信息  count  RWInfo
-// extern struct IPT IPDentrys[100];
-// extern std::vector<IPT> IPDentrys;
 extern std::map<int,IPT> IPDentrys;
-extern int IPD_index;
+
+
 extern std::map<int,RWInfo> RWBuffers;
 extern  int bufferIdx;
 // extern std::vector<int> diff(RWBuffers.size()+1, 0);///  用来存储索引数组的地址 差
