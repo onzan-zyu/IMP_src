@@ -3,8 +3,8 @@
 * 间接访存存在依赖关系，目标地址load操作的cycle > 索引数组load操作的cycle-----》修改为两个Initial Interval内
 * 对最近的读写访问情况识别之后 需要对ReadBuffer进行清空  同时将bufferIdx置零
 
-* todo: 将识别到的索引按类存放(tag)
-  IPD entry中记录上一次使用的索引地址  便于将IPD entry和索引对应
+* todo: 索引数组标注地址信息
+* IPD entry中记录上一次使用的索引地址  IPD entry中上一次计算的索引地址和用于验证的索引数组 差值两个元素单位   addIPDEntry()的时候添加索引的地址  valid_IPD的时候每次计算完要更新上一次计算的索引地址
 
 
 #### BaseAddr的获取
