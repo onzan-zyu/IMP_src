@@ -106,7 +106,7 @@ namespace HyCUBESim {
 			DataType cmerge(DataType op1, DataType op2);
 			DataType loadcl(DataType op1, DataType op2);
 			DataType movcl(DataType op1, DataType op2);
-			DataType load(DataType op2, int size,int cycle,int count);
+			DataType load(DataType op2, int size,int cycle,int kII);
 			DataType store(DataType op1, DataType op2,int size,int cycle);
 			DataType jumpl(DataType op2);
 		};

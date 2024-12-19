@@ -926,7 +926,7 @@ namespace HyCUBESim {
 		return op1;
 	}
 	// cycle是config memory在映射上的cycle
-	DataType CGRATile::load(DataType op2, int size,int cycle,int count) {
+	DataType CGRATile::load(DataType op2, int size,int cycle,int kII) {
 		
 		// printf("load X=%d,Y=%d,current cycle=%d,address:%d",this->X ,this->Y,cycle,op2);
 		assert(size == 1 || size == 2 || size == 4);
@@ -945,11 +945,11 @@ namespace HyCUBESim {
 		}
 		// printf(" load data=%d\n",res);
 		//loopstart 和loop end的读入过滤
-		if(count>168920){
-			printf("kII=%d,bufferIdx=%d,address=%d,data=%d,size=%d\n",count,bufferIdx,op2,res,size);
+		if(kII>168920){
+			printf("kII=%d,bufferIdx=%d,address=%d,data=%d,size=%d\n",kII,bufferIdx,op2,res,size);
 		}
 		if(op2!=this->CGRA_MEMSIZE-2 && op2!=(this->CGRA_MEMSIZE-2)/2){
-			RWBuffers[bufferIdx++] = {(uint8_t)cycle,true,res,op2,false,count};
+			RWBuffers[bufferIdx++] = {(uint8_t)cycle,true,res,op2,false,kII};
 		}
 		
 		// LOG_load_store(LOG_INFO,"load X=%d,Y=%d,current cycle=%d,address:%d,size:%d,load data =%d\n",this->X ,this->Y,cycle,op2,size,res);

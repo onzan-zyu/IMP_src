@@ -4,8 +4,7 @@
 #include "IPD.h"
 std::map<int,RWInfo> RWBuffers;
 int bufferIdx=0;
-// struct IPT IPDentrys[100];// 间接访存模式存储结构体数组
-// std::vector<IPT> IPDentrys;
+
 std::map<int,IPT> IPDentrys;
 
 int InitialInterval;
@@ -32,8 +31,8 @@ void print_RWBuffers(){
             // LOG_Buffer(LOG_INFO,"\n\n-------------------------------------execute cycle finished-----------------------------------------------\n\n");
         }
         else{
-            LOG_Buffer(LOG_INFO,"RWBuffers[%d],count:%d,cycle:%d,%s,address:%d,value:%d,%s",
-                      cnt,pair.second.cur_count,pair.second.cycle,pair.second.IsLoad?"load":"store",
+            LOG_Buffer(LOG_INFO,"RWBuffers[%d],kII:%d,cycle:%d,%s,address:%d,value:%d,%s",
+                      cnt,pair.second.cur_kII,pair.second.cycle,pair.second.IsLoad?"load":"store",
                       pair.second.address,pair.second.value,pair.second.IsIndex?"Index Array":" ");
             cnt=cnt+1;
         }
@@ -237,7 +236,7 @@ int Detect_IMA_SPVM(){
         {
             for (int j=i-1;j>=0;j--)
             {//  索引数组        两个InitialInterval内的计算   控制寻找索引的范围
-                if (RWBuffers[j].IsIndex  &&  RWBuffers[i].cur_count-RWBuffers[j].cur_count<2*InitialInterval)//  是索引数组
+                if (RWBuffers[j].IsIndex  &&  RWBuffers[i].cur_kII-RWBuffers[j].cur_kII<2*InitialInterval)//  是索引数组
                 {
                     int temp_addr = RWBuffers[i].address - RWBuffers[j].value*4;
                 
@@ -250,16 +249,16 @@ int Detect_IMA_SPVM(){
                         if(BaseAddr_struct.find(temp_addr)==BaseAddr_struct.end()){// 创建新的
                             struct cnt_info temp_info;
                             temp_info.cnt = 1;
-                            temp_info.count = RWBuffers[i].cur_count;
+                            temp_info.kII = RWBuffers[i].cur_kII;
                             BaseAddr_struct[temp_addr]=  temp_info;
                         }else{
                             BaseAddr_struct[temp_addr].cnt++;
-                            BaseAddr_struct[temp_addr].count = RWBuffers[i].cur_count;
+                            BaseAddr_struct[temp_addr].kII = RWBuffers[i].cur_kII;
                         }
                         
                         //过了7个InitialInterval 后 hit数不到5的BaseAddr  移除
                         // printf("erase start\n");
-                        if((RWBuffers[i].cur_count>BaseAddr_struct[temp_addr].count+7*InitialInterval)&&BaseAddr_struct[temp_addr].count<5){
+                        if((RWBuffers[i].cur_kII>BaseAddr_struct[temp_addr].kII+7*InitialInterval)&&BaseAddr_struct[temp_addr].kII<5){
                                  BaseAddr_struct.erase(temp_addr);
                                 continue;      
                         }
@@ -269,7 +268,7 @@ int Detect_IMA_SPVM(){
                                                     i,RWBuffers[i].address,j,RWBuffers[j].value,i,j,temp_addr,BaseAddr_struct[temp_addr].cnt);
                         if (BaseAddr_struct[temp_addr].cnt>=5)//  提高 间接访存模式的要求
                         {   
-                            add_IPDEntry(temp_addr,2,BaseAddr_struct[temp_addr].count,index_address);
+                            add_IPDEntry(temp_addr,2,BaseAddr_struct[temp_addr].kII,index_address);
                             //    识别到了间接访存模式  将间接访存模式存储到 IPDentrys数组
                             LOG_IMA(LOG_INFO,"diff[%d]=%d,RWBuffer[%d] load address=%d,load value=%d base addr=%d,shift=%d  cnt=%d,last_idx_addr=%d\n",
                                                   i,diff[i],i,RWBuffers[i].address,RWBuffers[j].value,temp_addr,2,BaseAddr_struct[temp_addr].cnt,RWBuffers[j].address);
@@ -288,7 +287,7 @@ int Detect_IMA_SPVM(){
 int Index_array_Detect(){
     int temp;
     int prev = 0;
-    int count = 0;
+    // int count = 0;
     int flag  =0;
     std::vector<int> idx;//  用于存储当前的索引数组再RWBuffers中的index
     int pre_addr = 0;
@@ -355,7 +354,7 @@ int Index_array_Detect(){
 
 }
 
-int add_IPDEntry(int BaseAddr,uint8_t shift,int count,int last_idx_address){
+int add_IPDEntry(int BaseAddr,uint8_t shift,int kII,int last_idx_address){
     //  找到entry 
     if(IPDentrys.find(BaseAddr)!=IPDentrys.end())
     {
@@ -364,7 +363,7 @@ int add_IPDEntry(int BaseAddr,uint8_t shift,int count,int last_idx_address){
         return 0;
     }
     else{
-        struct IPT temp ={true,shift,count,0,false,last_idx_address};
+        struct IPT temp ={true,shift,kII,0,false,last_idx_address};
         IPDentrys[BaseAddr] = temp;
         // printf("add IPDentry\n");
         return 1;
@@ -376,41 +375,42 @@ int add_IPDEntry(int BaseAddr,uint8_t shift,int count,int last_idx_address){
 int valid_IPDEntry(std::vector<Valid_Idx>& index_array,std::map<int,int>target_addr,int curr_count){
     int temp; int cnt = 0;
     printf("validate entry\n");
-    LOG_Index(LOG_INFO,"IPD entry num:%d, index_array size=%d,target array size = %d\n",IPDentrys.size(),index_array.size(),target_addr.size());
     for(auto it = IPDentrys.begin(); it != IPDentrys.end();it++){
-        for(int j=0;j<index_array.size();j++){
-            // it->second.count+2*InitialInterval<=index_array[j].count   valid entry的时候不应该判断count差
-            
-            LOG_Index(LOG_INFO,"IPDaddr=%d,arrar_addr=%d,index_array[%d]=%d base=%d,idx*4+base = %d,count=%d\n",
-                        it->second.last_index_address,index_array[j].index_address,index_array[j],it->first,temp,it->second.count);    
+        for(int j=0;j<index_array.size();j++){            
+            LOG_Index(LOG_INFO,"IPDaddr=%d,arrar_addr=%d,index_array[%d]=%d base=%d,idx*4+base = %d,kII=%d\n",
+                        it->second.last_index_address,index_array[j].index_address,index_array[j],it->first,temp,it->second.kII);    
         // 索引数组的地址 和 IPDEntry的last_index_address 差距小 说明是entry所使用的索引
-            if(it->second.valid && index_array[j].index_address-it->second.last_index_address<=12){
+
+            if(it->second.valid && (index_array[j].index_address - it->second.last_index_address<=20) ){
                 temp = index_array[j].value * 4 + it->first;
                 
-                LOG_Index(LOG_INFO,"IPDaddr=%d,arrar_addr=%d,index_array[%d]=%d base=%d,idx*4+base = %d,count=%d\n",
-                        it->second.last_index_address,index_array[j].index_address,index_array[j],it->first,temp,it->second.count);    
+                LOG_Index(LOG_INFO,"IPD_last_addr=%d,arrar_addr=%d,arr-IPD=%d,index_array[%d]=%d base=%d,idx*4+base = %d,kII=%d\n",
+                        it->second.last_index_address,index_array[j].index_address,
+                        (index_array[j].index_address - it->second.last_index_address),index_array[j],it->first,temp,it->second.kII);    
                 
                 it->second.last_index_address = index_array[j].index_address;  //更新entry的last_index_address
                 // 根据模式找到了匹配的目标地址且目标地址和索引地址之间的差距小于2*InitialIntervald
-                if(target_addr.find(temp)!=target_addr.end() && target_addr[temp]-index_array[j].count<=2*InitialInterval){
+                if(target_addr.find(temp)!=target_addr.end() && target_addr[temp]-index_array[j].kII<=2*InitialInterval){
                     it->second.hit_cnt++;
-                    cnt++;
-
+                    // cnt++;
                     LOG_Validate(LOG_INFO,"pattern hit! index:%d shift:%d baseaddr:%d  target:%d  hitcount:%d\n",
                     index_array[j],it->second.shift,it->first,temp,it->second.hit_cnt);
                 }
             }
             //   标记entry中过了20个II且hit次数较少的
-            if(curr_count - it->second.count>20*InitialInterval && it->second.hit_cnt<6){
+            if((curr_count - it->second.kII>40*InitialInterval && it->second.hit_cnt<6) ||
+                (curr_count-it->second.kII>4*InitialInterval && it->second.hit_cnt<2)
+            
+            ){
                 it->second.valid = false;
             }
         }
     } 
-    LOG_Index(LOG_INFO,"target addr num=%d, hitcount sum=%d\n",
-                    target_addr.size(),cnt);
+    // LOG_Index(LOG_INFO,"target addr num=%d, hitcount sum=%d\n",
+    //                 target_addr.size(),cnt);
     //  遍历间接访存的entry 移除invalid的entry
     for(auto it = IPDentrys.begin(); it != IPDentrys.end();){
-        // (curr_count - it->second.count>5*InitialInterval&&it->second.hit_cnt<3) 
+        // (curr_count - it->second.kII>5*InitialInterval&&it->second.hit_cnt<3) 
         if(  !it->second.valid){
             LOG_Index(LOG_INFO,"remove baseadr:%d,hit_cnt:%d\n",it->first,it->second.hit_cnt);
             it = IPDentrys.erase(it);
@@ -431,15 +431,15 @@ int classify_array(){
     int target=0;
     for(int i=0;i<RWBuffers.size();i++){    //  load操作  索引数组
         if(RWBuffers[i].IsIndex && RWBuffers[i].IsLoad){
-            Valid_Idx temp = {int(RWBuffers[i].value),RWBuffers[i].cur_count,RWBuffers[i].address};
+            Valid_Idx temp = {int(RWBuffers[i].value),RWBuffers[i].cur_kII,RWBuffers[i].address};
             index_array.push_back(temp);
             idx++;
             LOG_TXT(LOG_INFO,"index,idx:%d,addr:%d,value:%d\n",i,RWBuffers[i].address,RWBuffers[i].value);
         }
         else if(RWBuffers[i].IsLoad){//  load数组  target数组
             if(target_addr.find(RWBuffers[i].address)==target_addr.end()){
-                target_addr.insert({RWBuffers[i].address,RWBuffers[i].cur_count});
-                // target_addr[RWBuffers[i].address] = RWBuffers[i].cur_count;
+                target_addr.insert({RWBuffers[i].address,RWBuffers[i].cur_kII});
+                // target_addr[RWBuffers[i].address] = RWBuffers[i].cur_kII;
             }
             target++;
             LOG_TXT(LOG_INFO,"target,idx:%d,addr:%d,value:%d\n",i,RWBuffers[i].address,RWBuffers[i].value);
@@ -453,8 +453,8 @@ int classify_array(){
 
 void print_IPD(){
     for(const auto&pair:IPDentrys){
-        LOG_IPDentry(LOG_INFO,"baseaddr:%d,valid:%s,shift:%d,count:%d,hit_cnt:%d\n",
-            pair.first,pair.second.valid?"valid":"invalid",pair.second.shift,pair.second.count,
+        LOG_IPDentry(LOG_INFO,"baseaddr:%d,valid:%s,shift:%d,kII:%d,hit_cnt:%d\n",
+            pair.first,pair.second.valid?"valid":"invalid",pair.second.shift,pair.second.kII,
             pair.second.hit_cnt);
     }
 }
