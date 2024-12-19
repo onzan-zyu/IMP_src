@@ -3,6 +3,8 @@
 * 间接访存存在依赖关系，目标地址load操作的cycle > 索引数组load操作的cycle-----》修改为两个Initial Interval内
 * 对最近的读写访问情况识别之后 需要对ReadBuffer进行清空  同时将bufferIdx置零
 
+* todo: 将识别到的索引按类存放(tag)
+  IPD entry中记录上一次使用的索引地址  便于将IPD entry和索引对应
 
 
 #### BaseAddr的获取
@@ -18,6 +20,7 @@
 * 12.13  根据识别到的间接访存模式 计算target address,当目标地址和索引数组之间的count差小于2个II为生效  反向限制
 * 12.13  根据索引的地址相同和值相同 将RWBUffer中此类索引修改为store操作 来排除数据干扰
 * 12.13  将识别间接访存模式 和 间接访存模式的验证采用统一的kII来做判断条件---->解决了运行两次valid 就core dump的问题
+* 12.15  判断IPDEntry.size()作为识别IMP和valid的条件时，需要先获取size，否则会产生core dump 执行次数168902 额外20次 = 168921
 
 
 

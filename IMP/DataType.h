@@ -6,6 +6,7 @@
 #define DATATYPE_H
 #include<stdint.h>
 #define AddrWD uint32_t
+// #define AddrWD int
 #define CycleWD uint64_t
 // AddrWD spmStart;
 // AddrWD spmEnd;

@@ -128,6 +128,7 @@ int main(int argc, char* argv[]) {
 		cgraInstance.executeCycle(count);
 		count++;
 	}
+	printf("\n\ncount=%d\n\n",count);
 
 	cgraInstance.setTotalCycles(count);
 

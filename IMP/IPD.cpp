@@ -11,7 +11,8 @@ std::map<int,IPT> IPDentrys;
 int InitialInterval;
 // base_addr count  when count==2,base addr valid
 std::map<int,int> BaseAddr_cnt;//when shift ==2
-std::vector<int> diff(RWBuffers.size()+1, 0);
+// std::vector<int> diff(RWBuffers.size()+1, 0);
+std::vector<int> diff(171, 0);
 
 //用于验证IPD pattern的索引数组和验证数组
 std::map<int,int>target_addr;
@@ -431,7 +432,10 @@ int classify_array(){
             LOG_TXT(LOG_INFO,"index,idx:%d,addr:%d,value:%d\n",i,RWBuffers[i].address,RWBuffers[i].value);
         }
         else if(RWBuffers[i].IsLoad){//  load数组
-            target_addr[RWBuffers[i].address] = RWBuffers[i].cur_count;
+            if(target_addr.find(RWBuffers[i].address)==target_addr.end()){
+                target_addr.insert({RWBuffers[i].address,RWBuffers[i].cur_count});
+                // target_addr[RWBuffers[i].address] = RWBuffers[i].cur_count;
+            }
             target++;
             LOG_TXT(LOG_INFO,"target,idx:%d,addr:%d,value:%d\n",i,RWBuffers[i].address,RWBuffers[i].value);
         }

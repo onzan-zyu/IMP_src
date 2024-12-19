@@ -38,6 +38,7 @@ namespace HyCUBESim {
 
 		HyIns currIns = configMem[PC];
 		std::string opstr  = opcodeStr(currIns.opcode);
+		
 		// LOG_TXT(LOG_INFO, "current cycle=%d op=%s PC=%d,LSR=%d,LER=%d,kII=%d,X=%d,Y=%d",currIns.current_cycle, opstr.c_str(),PC,LSR,LER ,kII,X,Y);
 		LOG(SIMULATOR) << "currIns ::\n";
 		printIns(currIns);
@@ -121,6 +122,9 @@ namespace HyCUBESim {
 		}
 
 		DataType ALUTempOut;
+		// if(kII>=168920){
+		// 	printf("kII=%d,cycle = %d,opstr=%s,op1=%d,ope=%d\n",kII,currIns.current_cycle,opstr.c_str(),operand1,operand2);
+		// }
 
 		switch(currIns.opcode){
 			case NOP:
@@ -244,6 +248,9 @@ namespace HyCUBESim {
 			case STORE :
 				LOG(SIMULATOR) << ": STORE," << operand1 << "," << operand2 << "\n";
 				if(!Pisvalid || predicate){
+					// if(kII>168920){
+					// 	printf("store kII=%d,,address=%d,data=%d\n",kII,operand2,operand1);
+					// }
 					//only store after checking predicate
 					//other operations dont care as the output is not routed.
 #ifdef ARCHI_16BIT
@@ -258,6 +265,9 @@ namespace HyCUBESim {
 				if(!Pisvalid || predicate){
 					//only store after checking predicate
 					//other operations dont care as the output is not routed.
+					if(kII>168920){
+						printf("storeH kII=%d,,address=%d,data=%d\n",kII,operand2,operand1);
+					}
 					ALUTempOut = store(operand1,operand2,2,currIns.current_cycle);
 				}
 				break;
@@ -266,6 +276,9 @@ namespace HyCUBESim {
 				if(!Pisvalid || predicate){
 					//only store after checking predicate
 					//other operations dont care as the output is not routed.
+					if(kII>168920){
+						printf("storeB kII=%d,,address=%d,data=%d\n",kII,operand2,operand1);
+					}
 					ALUTempOut = store(operand1,operand2,1,currIns.current_cycle);
 				}
 				break;
@@ -914,6 +927,7 @@ namespace HyCUBESim {
 	}
 	// cycle是config memory在映射上的cycle
 	DataType CGRATile::load(DataType op2, int size,int cycle,int count) {
+		
 		// printf("load X=%d,Y=%d,current cycle=%d,address:%d",this->X ,this->Y,cycle,op2);
 		assert(size == 1 || size == 2 || size == 4);
 		
@@ -931,6 +945,9 @@ namespace HyCUBESim {
 		}
 		// printf(" load data=%d\n",res);
 		//loopstart 和loop end的读入过滤
+		if(count>168920){
+			printf("kII=%d,bufferIdx=%d,address=%d,data=%d,size=%d\n",count,bufferIdx,op2,res,size);
+		}
 		if(op2!=this->CGRA_MEMSIZE-2 && op2!=(this->CGRA_MEMSIZE-2)/2){
 			RWBuffers[bufferIdx++] = {(uint8_t)cycle,true,res,op2,false,count};
 		}
@@ -945,6 +962,7 @@ namespace HyCUBESim {
 		if(op2!=this->CGRA_MEMSIZE-2 && op2!=(this->CGRA_MEMSIZE-2)/2){
 			RWBuffers[bufferIdx++] = {(uint8_t)cycle,false,op1,op2,false,-1};
 		}
+		
 		assert(size == 1 || size == 2 || size == 4);
 		DataType res = 0;
 		if(size == 1){
