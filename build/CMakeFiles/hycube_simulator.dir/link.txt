@@ -1,1 +1,1 @@
-/usr/lib/ccache/c++ -rdynamic CMakeFiles/hycube_simulator.dir/CGRA.o CMakeFiles/hycube_simulator.dir/CGRATile.o CMakeFiles/hycube_simulator.dir/IMP/IPD.o CMakeFiles/hycube_simulator.dir/hycube_sim.o CMakeFiles/hycube_simulator.dir/log.o -o hycube_simulator 
+/usr/lib/ccache/c++ -rdynamic CMakeFiles/hycube_simulator.dir/CGRA.o CMakeFiles/hycube_simulator.dir/CGRATile.o CMakeFiles/hycube_simulator.dir/IMP/IPD.o CMakeFiles/hycube_simulator.dir/SPM/spm.o CMakeFiles/hycube_simulator.dir/hycube_sim.o CMakeFiles/hycube_simulator.dir/log.o -o hycube_simulator 

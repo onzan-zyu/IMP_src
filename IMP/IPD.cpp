@@ -429,10 +429,12 @@ int classify_array(){
     printf("calssify array  RWBuffer size=%d\n",RWBuffers.size());   // 要排除store操作
     int idx=0;
     int target=0;
+
     for(int i=0;i<RWBuffers.size();i++){    //  load操作  索引数组
         if(RWBuffers[i].IsIndex && RWBuffers[i].IsLoad){
-            Valid_Idx temp = {int(RWBuffers[i].value),RWBuffers[i].cur_kII,RWBuffers[i].address};
-            index_array.push_back(temp);
+             Valid_Idx temp1 = {int(RWBuffers[i].value),RWBuffers[i].cur_kII,RWBuffers[i].address};
+            uint32_t tag = getTag(RWBuffers[i].address);
+            index_array.push_back(temp1);
             idx++;
             LOG_TXT(LOG_INFO,"index,idx:%d,addr:%d,value:%d\n",i,RWBuffers[i].address,RWBuffers[i].value);
         }

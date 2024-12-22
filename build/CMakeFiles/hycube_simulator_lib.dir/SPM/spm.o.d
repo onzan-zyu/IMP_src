@@ -1,8 +1,7 @@
-CMakeFiles/hycube_simulator.dir/IMP/IPD.o: \
- /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/IMP/IPD.cpp \
+CMakeFiles/hycube_simulator_lib.dir/SPM/spm.o: \
+ /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/SPM/spm.cpp \
  /usr/include/stdc-predef.h \
- /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/IMP/IPD.h \
- /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/IMP/../SPM/spm.h \
+ /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/SPM/spm.h \
  /usr/local/include/c++/12.1.0/cstdio \
  /usr/local/include/c++/12.1.0/x86_64-pc-linux-gnu/bits/c++config.h \
  /usr/local/include/c++/12.1.0/x86_64-pc-linux-gnu/bits/os_defines.h \
@@ -60,8 +59,8 @@ CMakeFiles/hycube_simulator.dir/IMP/IPD.o: \
  /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h /usr/include/alloca.h \
  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
  /usr/local/include/c++/12.1.0/bits/std_abs.h \
- /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/IMP/../SPM/../log.h \
- /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/IMP/../SPM/../opcodes.h \
+ /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/SPM/../log.h \
+ /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/SPM/../opcodes.h \
  /usr/local/include/c++/12.1.0/string \
  /usr/local/include/c++/12.1.0/bits/stringfwd.h \
  /usr/local/include/c++/12.1.0/bits/memoryfwd.h \
@@ -143,10 +142,11 @@ CMakeFiles/hycube_simulator.dir/IMP/IPD.o: \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
  /usr/local/include/c++/12.1.0/bits/charconv.h \
  /usr/local/include/c++/12.1.0/bits/basic_string.tcc \
- /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/IMP/../SPM/../IMP/DataType.h \
- /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/IMP/../SPM/../IMP/IPD.h \
- /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/IMP/DataType.h \
- /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/IMP/../data_structures.h \
+ /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/SPM/../IMP/DataType.h \
+ /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/SPM/../IMP/IPD.h \
+ /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/SPM/../IMP/../SPM/spm.h \
+ /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/SPM/../IMP/DataType.h \
+ /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/SPM/../IMP/../data_structures.h \
  /usr/local/include/c++/12.1.0/vector \
  /usr/local/include/c++/12.1.0/bits/stl_uninitialized.h \
  /usr/local/include/c++/12.1.0/bits/stl_vector.h \
@@ -166,7 +166,7 @@ CMakeFiles/hycube_simulator.dir/IMP/IPD.o: \
  /usr/local/include/c++/12.1.0/bits/deque.tcc \
  /usr/local/include/c++/12.1.0/bits/stl_heap.h \
  /usr/local/include/c++/12.1.0/bits/stl_queue.h \
- /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/IMP/../log.h \
+ /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/SPM/../IMP/../log.h \
  /usr/local/include/c++/12.1.0/math.h /usr/local/include/c++/12.1.0/cmath \
  /usr/include/math.h /usr/include/x86_64-linux-gnu/bits/math-vector.h \
  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \

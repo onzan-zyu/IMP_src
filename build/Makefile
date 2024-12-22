@@ -197,6 +197,24 @@ IMP/IPD.s:
 .PHONY : IMP/IPD.s
 
 # target to build an object file
+SPM/spm.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/SPM/spm.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/SPM/spm.o
+.PHONY : SPM/spm.o
+
+# target to preprocess a source file
+SPM/spm.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/SPM/spm.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/SPM/spm.i
+.PHONY : SPM/spm.i
+
+# target to generate assembly for a file
+SPM/spm.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/SPM/spm.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/SPM/spm.s
+.PHONY : SPM/spm.s
+
+# target to build an object file
 hycube_sim.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator_lib.dir/build.make CMakeFiles/hycube_simulator_lib.dir/hycube_sim.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/hycube_simulator.dir/build.make CMakeFiles/hycube_simulator.dir/hycube_sim.o
@@ -251,6 +269,9 @@ help:
 	@echo "... IMP/IPD.o"
 	@echo "... IMP/IPD.i"
 	@echo "... IMP/IPD.s"
+	@echo "... SPM/spm.o"
+	@echo "... SPM/spm.i"
+	@echo "... SPM/spm.s"
 	@echo "... hycube_sim.o"
 	@echo "... hycube_sim.i"
 	@echo "... hycube_sim.s"

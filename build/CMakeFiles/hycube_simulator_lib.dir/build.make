@@ -111,10 +111,24 @@ CMakeFiles/hycube_simulator_lib.dir/IMP/IPD.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/hycube_simulator_lib.dir/IMP/IPD.s"
 	/usr/lib/ccache/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/IMP/IPD.cpp -o CMakeFiles/hycube_simulator_lib.dir/IMP/IPD.s
 
+CMakeFiles/hycube_simulator_lib.dir/SPM/spm.o: CMakeFiles/hycube_simulator_lib.dir/flags.make
+CMakeFiles/hycube_simulator_lib.dir/SPM/spm.o: ../SPM/spm.cpp
+CMakeFiles/hycube_simulator_lib.dir/SPM/spm.o: CMakeFiles/hycube_simulator_lib.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/hycube_simulator_lib.dir/SPM/spm.o"
+	/usr/lib/ccache/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/hycube_simulator_lib.dir/SPM/spm.o -MF CMakeFiles/hycube_simulator_lib.dir/SPM/spm.o.d -o CMakeFiles/hycube_simulator_lib.dir/SPM/spm.o -c /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/SPM/spm.cpp
+
+CMakeFiles/hycube_simulator_lib.dir/SPM/spm.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/hycube_simulator_lib.dir/SPM/spm.i"
+	/usr/lib/ccache/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/SPM/spm.cpp > CMakeFiles/hycube_simulator_lib.dir/SPM/spm.i
+
+CMakeFiles/hycube_simulator_lib.dir/SPM/spm.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/hycube_simulator_lib.dir/SPM/spm.s"
+	/usr/lib/ccache/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/SPM/spm.cpp -o CMakeFiles/hycube_simulator_lib.dir/SPM/spm.s
+
 CMakeFiles/hycube_simulator_lib.dir/hycube_sim.o: CMakeFiles/hycube_simulator_lib.dir/flags.make
 CMakeFiles/hycube_simulator_lib.dir/hycube_sim.o: ../hycube_sim.cpp
 CMakeFiles/hycube_simulator_lib.dir/hycube_sim.o: CMakeFiles/hycube_simulator_lib.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/hycube_simulator_lib.dir/hycube_sim.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/hycube_simulator_lib.dir/hycube_sim.o"
 	/usr/lib/ccache/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/hycube_simulator_lib.dir/hycube_sim.o -MF CMakeFiles/hycube_simulator_lib.dir/hycube_sim.o.d -o CMakeFiles/hycube_simulator_lib.dir/hycube_sim.o -c /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/hycube_sim.cpp
 
 CMakeFiles/hycube_simulator_lib.dir/hycube_sim.i: cmake_force
@@ -128,7 +142,7 @@ CMakeFiles/hycube_simulator_lib.dir/hycube_sim.s: cmake_force
 CMakeFiles/hycube_simulator_lib.dir/log.o: CMakeFiles/hycube_simulator_lib.dir/flags.make
 CMakeFiles/hycube_simulator_lib.dir/log.o: ../log.cpp
 CMakeFiles/hycube_simulator_lib.dir/log.o: CMakeFiles/hycube_simulator_lib.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/hycube_simulator_lib.dir/log.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/hycube_simulator_lib.dir/log.o"
 	/usr/lib/ccache/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/hycube_simulator_lib.dir/log.o -MF CMakeFiles/hycube_simulator_lib.dir/log.o.d -o CMakeFiles/hycube_simulator_lib.dir/log.o -c /home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/log.cpp
 
 CMakeFiles/hycube_simulator_lib.dir/log.i: cmake_force
@@ -144,6 +158,7 @@ hycube_simulator_lib_OBJECTS = \
 "CMakeFiles/hycube_simulator_lib.dir/CGRA.o" \
 "CMakeFiles/hycube_simulator_lib.dir/CGRATile.o" \
 "CMakeFiles/hycube_simulator_lib.dir/IMP/IPD.o" \
+"CMakeFiles/hycube_simulator_lib.dir/SPM/spm.o" \
 "CMakeFiles/hycube_simulator_lib.dir/hycube_sim.o" \
 "CMakeFiles/hycube_simulator_lib.dir/log.o"
 
@@ -153,11 +168,12 @@ hycube_simulator_lib_EXTERNAL_OBJECTS =
 libhycube_simulator_lib.a: CMakeFiles/hycube_simulator_lib.dir/CGRA.o
 libhycube_simulator_lib.a: CMakeFiles/hycube_simulator_lib.dir/CGRATile.o
 libhycube_simulator_lib.a: CMakeFiles/hycube_simulator_lib.dir/IMP/IPD.o
+libhycube_simulator_lib.a: CMakeFiles/hycube_simulator_lib.dir/SPM/spm.o
 libhycube_simulator_lib.a: CMakeFiles/hycube_simulator_lib.dir/hycube_sim.o
 libhycube_simulator_lib.a: CMakeFiles/hycube_simulator_lib.dir/log.o
 libhycube_simulator_lib.a: CMakeFiles/hycube_simulator_lib.dir/build.make
 libhycube_simulator_lib.a: CMakeFiles/hycube_simulator_lib.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX static library libhycube_simulator_lib.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/lxf/workspace/zaz/morpher-v2/cppsimulator/src/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX static library libhycube_simulator_lib.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/hycube_simulator_lib.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/hycube_simulator_lib.dir/link.txt --verbose=$(VERBOSE)
 

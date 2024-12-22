@@ -27,6 +27,8 @@ void log_IPDentry(LogLevel level, const char *file, int line, const char *format
 
 void log_validate_hit(LogLevel level, const char *file, int line, const char *format, ...);
 
+void log_analyze(LogLevel level, const char *file, int line, const char *format, ...);
+
 
 // 宏定义，用于简化日志记录
 #define LOG_TXT(level, format, ...) log_messages(level, __FILE__, __LINE__, format, ##__VA_ARGS__)
@@ -40,5 +42,6 @@ void log_validate_hit(LogLevel level, const char *file, int line, const char *fo
 #define LOG_IPDentry(level,format,...) log_IPDentry(level, __FILE__, __LINE__, format, ##__VA_ARGS__)
 #define LOG_Validate(level,format,...) log_validate_hit(level, __FILE__, __LINE__, format, ##__VA_ARGS__)
 
+#define LOG_Analyze(level,format,...) log_analyze(level, __FILE__, __LINE__, format, ##__VA_ARGS__)
 
 #endif // LOG_H

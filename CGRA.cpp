@@ -364,7 +364,11 @@ int CGRA::executeCycle(int kII) {
 	//  执行一次循环将进行一次间接访存分析和依次间接访存模式匹配
 	// src2dest count等于40 可识别到间接访存模式kII%120==119
 	// printf("IPD size=%d\n",IPDentrys.size());
-	
+	if(kII %10000==9999) {
+		printInfo();
+	}
+
+	IPDEnable = false;
 	if(kII%100==99 && IPDEnable){
 		int num = IPDentrys.size();
 		printf("kII=%d,IPD entry size=%d,RWBuffer.size=%d ",kII,IPDentrys.size(),RWBuffers.size());

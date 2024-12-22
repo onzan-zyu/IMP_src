@@ -950,6 +950,7 @@ namespace HyCUBESim {
 		}
 		if(op2!=this->CGRA_MEMSIZE-2 && op2!=(this->CGRA_MEMSIZE-2)/2){
 			RWBuffers[bufferIdx++] = {(uint8_t)cycle,true,res,op2,false,kII};
+			AddressAnalyze(op2,kII,true);
 		}
 		
 		// LOG_load_store(LOG_INFO,"load X=%d,Y=%d,current cycle=%d,address:%d,size:%d,load data =%d\n",this->X ,this->Y,cycle,op2,size,res);
@@ -961,6 +962,7 @@ namespace HyCUBESim {
 		// LOG_load_store(LOG_INFO,"store X=%d,Y=%d,current cycle=%d,address:%d size=%d store data=%d",this->X ,this->Y,cycle,op2,size,op1);
 		if(op2!=this->CGRA_MEMSIZE-2 && op2!=(this->CGRA_MEMSIZE-2)/2){
 			RWBuffers[bufferIdx++] = {(uint8_t)cycle,false,op1,op2,false,-1};
+			AddressAnalyze(op2,-1,false);
 		}
 		
 		assert(size == 1 || size == 2 || size == 4);

@@ -5,6 +5,7 @@
 #ifndef IPD_H
 #define IPD_H
 
+#include "../SPM/spm.h"
 #include "DataType.h"
 #include "../data_structures.h"
 #include "../log.h"
@@ -41,7 +42,7 @@ struct cnt_info{
 struct Valid_Idx{
     int value;/// 用于验证的索引的值
     int kII;/// 该索引所处的count
-    int index_address;  //索引的地址标签
+    AddrWD index_address;  //索引的地址标签
 };
 
 

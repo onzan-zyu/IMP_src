@@ -23,6 +23,9 @@
 * 12.15  判断IPDEntry.size()作为识别IMP和valid的条件时，需要先获取size，否则会产生core dump 执行次数168902 额外20次 = 168921
 
 
+* 12.22  完成了地址hit miss的识别功能   todo----如何预取  什么时机插入合适的预取  预取和判断预取的时机   怎么样预取才不会导致miss
+
+
 
 
 
@@ -35,10 +38,7 @@
 * 组相联映射
   * 一个cache组中有多个cache line， cache line是从主存中读取数据的基本单位 尽管可能只访问line中的一个byte
 
-
-
-
-
+  
 * 之前的bank大小 536870912    现在采用 536870912*4
 
 
@@ -54,5 +54,6 @@
   * SPM的带宽通常高于内存，SPM用于优化特定应用，主存带宽受到总线宽度和频率的限制，与SPM有较大差距
   * **综上 认为SPM的数据访问延迟为1cycle   当SPM访问发生miss时，需要访问内存，访问延迟假设为15cycle**
 
-
+#### 运行命令
+*  python -u run_morpher_llvm16.py runahead_benchmarks/cora/cora.c cora  config/coverage.yaml sim_only
 

@@ -5,6 +5,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/hycube_simulator.dir/CGRATile.o.d"
   "CMakeFiles/hycube_simulator.dir/IMP/IPD.o"
   "CMakeFiles/hycube_simulator.dir/IMP/IPD.o.d"
+  "CMakeFiles/hycube_simulator.dir/SPM/spm.o"
+  "CMakeFiles/hycube_simulator.dir/SPM/spm.o.d"
   "CMakeFiles/hycube_simulator.dir/hycube_sim.o"
   "CMakeFiles/hycube_simulator.dir/hycube_sim.o.d"
   "CMakeFiles/hycube_simulator.dir/log.o"

@@ -13,16 +13,19 @@
 # #target_link_libraries(${PROJ} nlohmann_json::nlohmann_json)
 project(hycube_simulator)
 # add cpp source and header file
-FILE(GLOB MyCPPSources *.cpp IMP/*.cpp)
-FILE(GLOB MyHSources *.h IMP/*.h)
+FILE(GLOB MyCPPSources *.cpp IMP/*.cpp SPM/*.cpp)
+FILE(GLOB MyHSources *.h IMP/*.h SPM/*.h)
 
 set(PROJ_LIB "hycube_simulator_lib")
 set(PROJ_EXE "hycube_simulator")
 
 #find_package(nlohmann_json CONFIG REQUIRED)
 
-add_library(${PROJ_LIB} STATIC ${MyCPPSources} ${MyHSources})
-add_executable(${PROJ_EXE} ${MyCPPSources})
+add_library(${PROJ_LIB} STATIC ${MyCPPSources} ${MyHSources}
+        SPM/spm.cpp)
+add_executable(${PROJ_EXE} ${MyCPPSources}
+        SPM/spm.cpp
+)
 
 # Use C++11 to compile our pass (i.e., supply -std=c++11).
 target_compile_features(${PROJ_LIB} PRIVATE cxx_range_for cxx_auto_type)

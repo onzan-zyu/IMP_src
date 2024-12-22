@@ -1,2 +1,2 @@
-/usr/bin/ar qc libhycube_simulator_lib.a CMakeFiles/hycube_simulator_lib.dir/CGRA.o CMakeFiles/hycube_simulator_lib.dir/CGRATile.o CMakeFiles/hycube_simulator_lib.dir/IMP/IPD.o CMakeFiles/hycube_simulator_lib.dir/hycube_sim.o CMakeFiles/hycube_simulator_lib.dir/log.o
+/usr/bin/ar qc libhycube_simulator_lib.a CMakeFiles/hycube_simulator_lib.dir/CGRA.o CMakeFiles/hycube_simulator_lib.dir/CGRATile.o CMakeFiles/hycube_simulator_lib.dir/IMP/IPD.o CMakeFiles/hycube_simulator_lib.dir/SPM/spm.o CMakeFiles/hycube_simulator_lib.dir/hycube_sim.o CMakeFiles/hycube_simulator_lib.dir/log.o
 /usr/bin/ranlib libhycube_simulator_lib.a

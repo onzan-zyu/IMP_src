@@ -11,6 +11,7 @@
 #include "data_structures.h"
 #include "CGRATile.h"
 #include "IMP/IPD.h"
+#include "SPM/spm.h"
 #include <fstream>
 #include <map>
 #include <string>
