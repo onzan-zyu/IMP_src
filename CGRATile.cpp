@@ -254,9 +254,9 @@ namespace HyCUBESim {
 					//only store after checking predicate
 					//other operations dont care as the output is not routed.
 #ifdef ARCHI_16BIT
-					ALUTempOut = store(operand1,operand2,2,currIns.current_cycle);
+					ALUTempOut = store(operand1,operand2,2,currIns.current_cycle,kII);
 #else
-					ALUTempOut = store(operand1,operand2,4,currIns.current_cycle);
+					ALUTempOut = store(operand1,operand2,4,currIns.current_cycle,kII);
 #endif
 				}
 				break;
@@ -268,7 +268,7 @@ namespace HyCUBESim {
 					if(kII>168920){
 						printf("storeH kII=%d,,address=%d,data=%d\n",kII,operand2,operand1);
 					}
-					ALUTempOut = store(operand1,operand2,2,currIns.current_cycle);
+					ALUTempOut = store(operand1,operand2,2,currIns.current_cycle,kII);
 				}
 				break;
 			case STOREB :
@@ -279,7 +279,7 @@ namespace HyCUBESim {
 					if(kII>168920){
 						printf("storeB kII=%d,,address=%d,data=%d\n",kII,operand2,operand1);
 					}
-					ALUTempOut = store(operand1,operand2,1,currIns.current_cycle);
+					ALUTempOut = store(operand1,operand2,1,currIns.current_cycle,kII);
 				}
 				break;
 			case JUMPL :
@@ -957,12 +957,12 @@ namespace HyCUBESim {
 		return res;
 	}
 
-	DataType CGRATile::store(DataType op1, DataType op2, int size,int cycle) {
+	DataType CGRATile::store(DataType op1, DataType op2, int size,int cycle,int kII) {
 		// printf("X=%d,Y=%d,current cycle=%d,store address:%d,store data=%d\n",this->X ,this->Y,cycle,op2,op1);
 		// LOG_load_store(LOG_INFO,"store X=%d,Y=%d,current cycle=%d,address:%d size=%d store data=%d",this->X ,this->Y,cycle,op2,size,op1);
 		if(op2!=this->CGRA_MEMSIZE-2 && op2!=(this->CGRA_MEMSIZE-2)/2){
-			RWBuffers[bufferIdx++] = {(uint8_t)cycle,false,op1,op2,false,-1};
-			AddressAnalyze(op2,-1,false);
+			RWBuffers[bufferIdx++] = {(uint8_t)cycle,false,op1,op2,false,kII};
+			AddressAnalyze(op2,kII,false);
 		}
 		
 		assert(size == 1 || size == 2 || size == 4);

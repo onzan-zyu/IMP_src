@@ -48,12 +48,18 @@ uint32_t getReplacementBlockId(){
 void AddressAnalyze(AddrWD addr,int kII,bool IsLoad){
   if(IsLoad) MyStatics.numRead++;
   else MyStatics.numWrite++;
-  if(inSPM(addr)>0){
+  if(inSPM(addr)>=0){
     MyStatics.numHit+=1;
     MySPM.blocks[inSPM(addr)].lastReference = kII;
   }else{
     MyStatics.numMiss+=1;
       replaceBlock(addr,kII);
+  }
+  float missrate = (float)MyStatics.numMiss/(MyStatics.numHit+MyStatics.numMiss);
+  
+  if(missrate>0.1&&flag){
+    flag = false;
+    printf("current kII=%d,missrate=%f,need prefetch\n");
   }
 }
 void RWBuffersAnalyze(){
@@ -62,7 +68,7 @@ void RWBuffersAnalyze(){
       MyStatics.numRead++;
     else
       MyStatics.numWrite++;
-    if(inSPM(RWBuffers[i].address)>0){
+    if(inSPM(RWBuffers[i].address)>=0){
         MyStatics.numHit++;
         MySPM.blocks[inSPM(RWBuffers[i].address)].lastReference = RWBuffers[i].cur_kII;
     }else{
@@ -84,8 +90,8 @@ bool replaceBlock(AddrWD addr,int cur_kII){
     b.startAddr = getStartAddr(addr);
     b.endAddr = getEndAddr(addr);
     b.lastReference = cur_kII;
-    LOG_Analyze(LOG_INFO,"cur_kII:%d addrese:%d,Block %d is replaced,tag=%d\n",
-         cur_kII,addr,id,b.tag);
+    LOG_Analyze(LOG_INFO,"cur_kII:%d addrese:%x,Block %d is replaced,tag=%x,replace index=%x,addr:%x-%x\n",
+         cur_kII,addr,id,b.tag,b.index,b.startAddr,b.endAddr);
     return true;
 }
 uint32_t getStartAddr(AddrWD addr){
@@ -96,14 +102,16 @@ uint32_t getEndAddr(AddrWD addr){
   return getStartAddr(addr)+BLOCK_SIZE;
 }
 void printInfo(){
+  float hitrate = (float)MyStatics.numHit/(MyStatics.numHit+MyStatics.numMiss);
+    float missrate = (float)MyStatics.numHit/(MyStatics.numHit+MyStatics.numMiss);
     printf(" Static Info:\nnumRead:%d\nnumWrite:%d\nnumHit:%d\nnumMiss:%d\nhitRate=%f,missRate=%f\n",
-           MyStatics.numRead,MyStatics.numWrite,MyStatics.numHit,MyStatics.numMiss,MyStatics.numHit/(MyStatics.numHit+MyStatics.numMiss),MyStatics.numMiss/(MyStatics.numHit+MyStatics.numMiss));
+           MyStatics.numRead,MyStatics.numWrite,MyStatics.numHit,MyStatics.numMiss,hitrate,missrate);
     LOG_Analyze(LOG_INFO," Static Info: numRead:%d,numWrite:%d,numHit:%d,numMiss:%d\n",
          MyStatics.numRead,MyStatics.numWrite,MyStatics.numHit,MyStatics.numMiss);
 }
 void printBlock(){
   for(int i=0;i<SPM_BLOCK_NUM;i++){
-      LOG_Analyze(LOG_INFO," Block Info: valid:%s,tag:%d,index:%d,lastReference:%d,startAddr:%d,endAddr:%d\n",
+      LOG_Analyze(LOG_INFO," Block Info: valid:%s,tag:%x,index:%x,lastReference:%d,startAddr:%x,endAddr:%x\n",
            MySPM.blocks[i].valid?"true":"false",MySPM.blocks[i].tag,MySPM.blocks[i].index,MySPM.blocks[i].lastReference,MySPM.blocks[i].startAddr,MySPM.blocks[i].endAddr);
   }
 

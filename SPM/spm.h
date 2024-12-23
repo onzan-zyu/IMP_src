@@ -16,6 +16,7 @@
 #define SPM_BLOCK_NUM  (1 << BLOCK_INDEX_BIT)
 #define SPM_SIZE  (BLOCK_SIZE * SPM_BLOCK_NUM)    //spm划分为多少个block 64B*8=512B
 
+inline bool flag = true;
 
 struct Block {
     bool valid;
