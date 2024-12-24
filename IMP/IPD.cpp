@@ -19,7 +19,7 @@ std::vector<Valid_Idx> index_array;
 // std::map<int,int> BaseAddr_cnt1;//when shift ==3
 // std::map<int,int>BaseAddr_cnt2;  //when shift ==4
 
-bool IPDEnable= true;
+bool IPDEnable= false;
 
 
 
@@ -239,11 +239,6 @@ int Detect_IMA_SPVM(){
                 if (RWBuffers[j].IsIndex  &&  RWBuffers[i].cur_kII-RWBuffers[j].cur_kII<2*InitialInterval)//  是索引数组
                 {
                     int temp_addr = RWBuffers[i].address - RWBuffers[j].value*4;
-                
-                    // int temp_addr1 = RWBuffers[i].address - RWBuffers[j].value*8;
-                    ///////////////////有待进一步商榷 当value为0时 访存地址为本身
-                    ///// to do 需要过滤 还是 根据识别到的访存模式进一步去检测未来的地址是否正确
-                    // if (temp_addr>0&&RWBuffers[j].value!=0)
                     if (temp_addr>0)
                     {
                         if(BaseAddr_struct.find(temp_addr)==BaseAddr_struct.end()){// 创建新的
@@ -257,7 +252,6 @@ int Detect_IMA_SPVM(){
                         }
                         
                         //过了7个InitialInterval 后 hit数不到5的BaseAddr  移除
-                        // printf("erase start\n");
                         if((RWBuffers[i].cur_kII>BaseAddr_struct[temp_addr].kII+7*InitialInterval)&&BaseAddr_struct[temp_addr].kII<5){
                                  BaseAddr_struct.erase(temp_addr);
                                 continue;      
@@ -374,14 +368,16 @@ int add_IPDEntry(int BaseAddr,uint8_t shift,int kII,int last_idx_address){
 // 用检测到的索引和target来 验证IPD的entry    如何判断 IPDEntry 和index之间的count差在两个II之内
 int valid_IPDEntry(std::vector<Valid_Idx>& index_array,std::map<int,int>target_addr,int curr_count){
     int temp; int cnt = 0;
-    printf("validate entry\n");
+    printf("validate entry\n"); int prefetch_cnt = 0;
     for(auto it = IPDentrys.begin(); it != IPDentrys.end();it++){
         for(int j=0;j<index_array.size();j++){            
             LOG_Index(LOG_INFO,"IPDaddr=%d,arrar_addr=%d,index_array[%d]=%d base=%d,idx*4+base = %d,kII=%d\n",
                         it->second.last_index_address,index_array[j].index_address,index_array[j],it->first,temp,it->second.kII);    
         // 索引数组的地址 和 IPDEntry的last_index_address 差距小 说明是entry所使用的索引
-
-            if(it->second.valid && (index_array[j].index_address - it->second.last_index_address<=20) ){
+            // 验证的数组为没有进行预取的
+            if(it->second.valid && (index_array[j].index_address - it->second.last_index_address<=20) 
+                &&(!it->second.prefetch_valid)
+            ){
                 temp = index_array[j].value * 4 + it->first;
                 
                 LOG_Index(LOG_INFO,"IPD_last_addr=%d,arrar_addr=%d,arr-IPD=%d,index_array[%d]=%d base=%d,idx*4+base = %d,kII=%d\n",
@@ -391,23 +387,32 @@ int valid_IPDEntry(std::vector<Valid_Idx>& index_array,std::map<int,int>target_a
                 it->second.last_index_address = index_array[j].index_address;  //更新entry的last_index_address
                 // 根据模式找到了匹配的目标地址且目标地址和索引地址之间的差距小于2*InitialIntervald
                 if(target_addr.find(temp)!=target_addr.end() && target_addr[temp]-index_array[j].kII<=2*InitialInterval){
-                    it->second.hit_cnt++;
-                    // cnt++;
+                    it->second.hit_cnt+=1;
+                    
+                    // cnt++;  达到了标准  用于预取
+                    if(it->second.hit_cnt>=10){
+                        it->second.prefetch_valid = true;
+                        prefetchEnable = true;//  启动预取
+                        LOG_FILE(LOG_INFO,"prefetch","base:%d,shift:2,hit_cnt:%d is used for prefetch\n",it->first,it->second.hit_cnt);
+                    }
                     LOG_Validate(LOG_INFO,"pattern hit! index:%d shift:%d baseaddr:%d  target:%d  hitcount:%d\n",
-                    index_array[j],it->second.shift,it->first,temp,it->second.hit_cnt);
+                    index_array[j].index_address,it->second.shift,it->first,temp,it->second.hit_cnt);
                 }
             }
+            else if(it->second.prefetch_valid==true){
+                prefetch_cnt++;
+                if(prefetch_cnt==IPDentrys.size()) IPDEnable = false;
+            }
+            
             //   标记entry中过了20个II且hit次数较少的
             if((curr_count - it->second.kII>40*InitialInterval && it->second.hit_cnt<6) ||
                 (curr_count-it->second.kII>4*InitialInterval && it->second.hit_cnt<2)
-            
             ){
                 it->second.valid = false;
             }
         }
     } 
-    // LOG_Index(LOG_INFO,"target addr num=%d, hitcount sum=%d\n",
-    //                 target_addr.size(),cnt);
+
     //  遍历间接访存的entry 移除invalid的entry
     for(auto it = IPDentrys.begin(); it != IPDentrys.end();){
         // (curr_count - it->second.kII>5*InitialInterval&&it->second.hit_cnt<3) 
@@ -426,16 +431,16 @@ int valid_IPDEntry(std::vector<Valid_Idx>& index_array,std::map<int,int>target_a
 
  // 标注用于 validate 的索引数组 和目标数组
 int classify_array(){
-    printf("calssify array  RWBuffer size=%d\n",RWBuffers.size());   // 要排除store操作
-    int idx=0;
-    int target=0;
+    // printf("calssify array  RWBuffer size=%d\n",RWBuffers.size());   // 要排除store操作
+    // int idx=0;
+    // int target=0;
 
     for(int i=0;i<RWBuffers.size();i++){    //  load操作  索引数组
         if(RWBuffers[i].IsIndex && RWBuffers[i].IsLoad){
              Valid_Idx temp1 = {int(RWBuffers[i].value),RWBuffers[i].cur_kII,RWBuffers[i].address};
             uint32_t tag = getTag(RWBuffers[i].address);
             index_array.push_back(temp1);
-            idx++;
+            // idx++;
             LOG_TXT(LOG_INFO,"index,idx:%d,addr:%d,value:%d\n",i,RWBuffers[i].address,RWBuffers[i].value);
         }
         else if(RWBuffers[i].IsLoad){//  load数组  target数组
@@ -443,23 +448,94 @@ int classify_array(){
                 target_addr.insert({RWBuffers[i].address,RWBuffers[i].cur_kII});
                 // target_addr[RWBuffers[i].address] = RWBuffers[i].cur_kII;
             }
-            target++;
+            // target++;
             LOG_TXT(LOG_INFO,"target,idx:%d,addr:%d,value:%d\n",i,RWBuffers[i].address,RWBuffers[i].value);
         }
     }
-    printf("classify finished index size=%d,target num=%d,target_addr size=%d\n",idx,target,target_addr.size());
+    // printf("classify finished index size=%d,target num=%d,target_addr size=%d\n",idx,target,target_addr.size());
     return 1;
+}
+
+
+int validate_while_run(int addr,int value,int kII){
+    int IsIndex= 0;
+    for( auto pair = IPDentrys.begin(); pair != IPDentrys.end();++pair){
+        // 用于预取的模式跳过
+        if(pair->second.prefetch_valid){
+            continue;
+        }
+        if( (addr - pair->second.last_index_address<=20)){// 是自身的索引 生成地址
+            // printf("addr kii=%d, addr=%d,last_index=%d,pair.baseAddr=%d\n",kII,addr,pair->second.last_index_address,pair->first);
+            int targetAddr = value * 4 + pair->first;//根据索引流生成的目标地址
+            IsIndex = 1;
+            pair->second.last_index_address = addr;
+            LOG_Index(LOG_INFO,"index addr:%d,IPD last_index_addr:%d,target_addr:%d\n",addr,pair->second.last_index_address,targetAddr);
+            if(pair->second.target_gen.find(targetAddr)==pair->second.target_gen.end()){
+                pair->second.target_gen[targetAddr] = 1;
+            }
+        }
+    }
+    if(IsIndex)
+        return 1;
+    for( auto pair = IPDentrys.begin(); pair != IPDentrys.end();++pair)
+    {  //不是自身的索引 查看是否命中
+        // printf("target addr=%d\n",addr);
+        if(pair->second.target_gen.find(addr)!=pair->second.target_gen.end()){
+            pair->second.hit_cnt = pair->second.hit_cnt+1;
+            LOG_Validate(LOG_INFO,"pattern hit: base;%d,,target:%d,hit_cnt:%d\n",
+                          pair->first,addr,pair->second.hit_cnt);
+
+            if(pair->second.hit_cnt>4){
+                pair->second.prefetch_valid = true;
+                prefetchEnable = true;
+                // pair->second.target_gen.clear();//用于预取则清楚
+            }
+        }
+    }
+
+     //  超过五个II  命中数不足3
+        // if( (kII-pair.second.kII>8*InitialInterval) && pair.second.hit_cnt<3){
+        //     printf("kII:%d,pair.kII:%d\n",kII,pair.second.kII);
+        //     pair.second.valid = false;
+        // }
+
+    // for(auto it = IPDentrys.begin(); it != IPDentrys.end();){
+    //     if(  !it->second.valid){
+    //         LOG_Index(LOG_INFO,"remove baseadr:%d,hit_cnt:%d\n",it->first,it->second.hit_cnt);
+    //         it = IPDentrys.erase(it);
+    //     }
+    //     else
+    //         ++it;
+    // }
+    return 0;
+        
+
+    
 }
 
 
 
 void print_IPD(){
     for(const auto&pair:IPDentrys){
-        LOG_IPDentry(LOG_INFO,"baseaddr:%d,valid:%s,shift:%d,kII:%d,hit_cnt:%d\n",
+        LOG_IPDentry(LOG_INFO,"baseaddr:%d,valid:%s,shift:%d,kII:%d,hit_cnt:%d,prefetchEnable=%s\n",
             pair.first,pair.second.valid?"valid":"invalid",pair.second.shift,pair.second.kII,
-            pair.second.hit_cnt);
+            pair.second.hit_cnt,pair.second.prefetch_valid?"true":"false");
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

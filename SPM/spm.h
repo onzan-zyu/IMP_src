@@ -12,7 +12,7 @@
 // 地址的划分问题  32位地址 = tag + block index + block size
 #define OFFSET_BIT 6    //64B = 16 * 4B
 #define BLOCK_SIZE (1 << OFFSET_BIT)
-#define BLOCK_INDEX_BIT 4
+#define BLOCK_INDEX_BIT 3  //SPM中block的数量
 #define SPM_BLOCK_NUM  (1 << BLOCK_INDEX_BIT)
 #define SPM_SIZE  (BLOCK_SIZE * SPM_BLOCK_NUM)    //spm划分为多少个block 64B*8=512B
 
@@ -61,6 +61,7 @@ struct Statics {
 
 inline struct SPM MySPM;
 inline struct Statics MyStatics;
+inline bool prefetchEnable = false;
 
 uint32_t getOffset(AddrWD addr);
 uint32_t getIndex(AddrWD addr);
@@ -76,4 +77,8 @@ void AddressAnalyze(AddrWD addr,int kII,bool IsLoad);
 bool replaceBlock(AddrWD addr,int cur_kII);
 
 void printInfo();
+void printBlock();
+void output();
+
+void prefetch(AddrWD addr, int value,int kII);
 #endif //SPM_H

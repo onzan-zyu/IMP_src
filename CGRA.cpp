@@ -366,13 +366,13 @@ int CGRA::executeCycle(int kII) {
 	// printf("IPD size=%d\n",IPDentrys.size());
 	if(kII %10000==9999) {
 		printInfo();
+		printBlock();
 	}
 
-	IPDEnable = false;
 	if(kII%100==99 && IPDEnable){
 		int num = IPDentrys.size();
-		printf("kII=%d,IPD entry size=%d,RWBuffer.size=%d ",kII,IPDentrys.size(),RWBuffers.size());
-		if(num<=5){//  间接访存模式较少   后面修改为SPM miss相关的数据
+		// printf("kII=%d,IPD entry size=%d,RWBuffer.size=%d ",kII,IPDentrys.size(),RWBuffers.size());
+		if(num<=10){//  间接访存模式较少   后面修改为SPM miss相关的数据
 			printf("detect buffer size:%d\n",RWBuffers.size());
 			Index_array_Detect();   // 检测Index数组
 			Detect_IMA_SPVM();
@@ -381,34 +381,33 @@ int CGRA::executeCycle(int kII) {
 			LOG_IPDentry(LOG_INFO,"Detect IPD kII=%d,IPD analyse finised,IPD entry size=%d\n",kII,IPDentrys.size());
 			LOG_Buffer(LOG_INFO,"\n\n-------------------------------------one detect IMA cycle finished-----------------------------------------------\n\n");
 		}
-		else if(num>=6){
-			printf("classify buffer size:%d\n",RWBuffers.size());
-			LOG_IPDentry(LOG_INFO,"valid IPD  kII=%d IPD entry size=%d,RWBUffer size=%d\n",kII,IPDentrys.size(),RWBuffers.size());
-			Index_array_Detect();
-			classify_array(); // 对应index target的clear
-			//kII传入的是当前的count  用于移除与当前count相差较远且hit次数少的pattern
-			valid_IPDEntry(index_array,target_addr,kII);
-			print_RWBuffers();
-			print_IPD();
-			LOG_IPDentry(LOG_INFO,"Detect IPD kII=%d,IPD analyse finised,IPD entry size=%d\n",kII,IPDentrys.size());
+		// else if(num>=4){
+		// 	printf("classify buffer size:%d\n",RWBuffers.size());
+		// 	LOG_IPDentry(LOG_INFO,"valid IPD  kII=%d IPD entry size=%d,RWBUffer size=%d\n",kII,IPDentrys.size(),RWBuffers.size());
+		// 	Index_array_Detect();
+		// 	classify_array(); // 对应index target的clear
+		// 	//kII传入的是当前的count  用于移除与当前count相差较远且hit次数少的pattern
+		// 	valid_IPDEntry(index_array,target_addr,kII);
+		// 	print_RWBuffers();
+		// 	print_IPD();
+		// 	LOG_IPDentry(LOG_INFO,"validate IPD kII=%d,validate finised,IPD entry size=%d\n",kII,IPDentrys.size());
 
-			if(index_array.size()>0){
-				// printf("index_size=%d",index_array.size());
-				index_array.clear();
-				// printf(" index_size=%d\n",index_array.size());
-			}
-			if(target_addr.size()>0){
-				// printf("target_size=%d",target_addr.size());
-				target_addr.clear();
-				// printf(" target_size=%d\n",target_addr.size());
-			}
+		// 	if(index_array.size()>0){
+		// 		index_array.clear();
+		// 	}
+		// 	if(target_addr.size()>0){
+		// 		target_addr.clear();
+		// 	}
 
-		}
+		// }
+
+
+
 		if(RWBuffers.size()!=0){
 				RWBuffers.clear();
 				bufferIdx = 0;
 		}
-		printf("kII=%d,IPD entry size=%d \n",kII,IPDentrys.size());
+		// printf("kII=%d,IPD entry size=%d \n",kII,IPDentrys.size());
 	}
 }
 // 

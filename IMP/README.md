@@ -24,6 +24,7 @@
 
 
 * 12.22  完成了地址hit miss的识别功能   todo----如何预取  什么时机插入合适的预取  预取和判断预取的时机   怎么样预取才不会导致miss
+* 12.24 new idea:考虑在运行时直接去验证IPD
 
 
 
@@ -56,4 +57,13 @@
 
 #### 运行命令
 *  python -u run_morpher_llvm16.py runahead_benchmarks/cora/cora.c cora  config/coverage.yaml sim_only
+
+
+
+#### 衡量效果的指标
+* 单独记录预取开始后的SPM miss数量
+* 有预取和无预取的访存延迟时间比值   
+* 准确率：  预取块中被访问的数量/预取的数量
+* 覆盖率：  预取导致的访存命中数量/总的缓存缺失数量    
+* 及时性：  访问的块是及时的数量/访问预取块的数量
 

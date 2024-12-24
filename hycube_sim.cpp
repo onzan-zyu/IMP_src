@@ -139,6 +139,7 @@ int main(int argc, char* argv[]) {
 		count++;
 	}
 	// print_IPD();
+	output();
 	cgraInstance.printInterestedAddrOutcome();
 
 	// cgraInstance.dumpStat();

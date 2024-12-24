@@ -28,9 +28,10 @@ void log_IPDentry(LogLevel level, const char *file, int line, const char *format
 void log_validate_hit(LogLevel level, const char *file, int line, const char *format, ...);
 
 void log_analyze(LogLevel level, const char *file, int line, const char *format, ...);
-
+void log_file(LogLevel level,char *name, const char *file, int line, const char *format, ...);
 
 // 宏定义，用于简化日志记录
+#define LOG_FILE(level,name, format, ...) log_file(level,name, __FILE__, __LINE__, format, ##__VA_ARGS__)
 #define LOG_TXT(level, format, ...) log_messages(level, __FILE__, __LINE__, format, ##__VA_ARGS__)
 #define LOG_load_store(level,format,...) log_address(level, __FILE__, __LINE__, format, ##__VA_ARGS__)
 #define LOG_Buffer(level,format,...) log_buffer(level, __FILE__, __LINE__, format, ##__VA_ARGS__)

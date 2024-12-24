@@ -950,6 +950,12 @@ namespace HyCUBESim {
 		}
 		if(op2!=this->CGRA_MEMSIZE-2 && op2!=(this->CGRA_MEMSIZE-2)/2){
 			RWBuffers[bufferIdx++] = {(uint8_t)cycle,true,res,op2,false,kII};
+			
+			
+			
+			// if(prefetchEnable)
+			// 	prefetch(op2,res,kII);
+			// validate_while_run(op2,res,kII);
 			AddressAnalyze(op2,kII,true);
 		}
 		

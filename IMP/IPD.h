@@ -21,6 +21,7 @@ struct IPT
     DataType hit_cnt;    // 模式命中的次数
     bool prefetch_valid;    //是否已经用于预取
     int last_index_address; // 当前的索引
+    std::map<int,int>target_gen;//根据索引流生成的目标地址数组
 };
 // RWBuffer的信息
 struct RWInfo
@@ -58,13 +59,18 @@ extern  int bufferIdx;
 extern std::vector<Valid_Idx> index_array;
 extern std::map<int,int>target_addr;
 
+inline int prefetch_num = 0;
 
 int Detect_IMA_rgb();
 int Detect_IMA_src2dest();
 int Detect_IMA_SPVM();
 void print_RWBuffers();
 int Index_array_Detect();
+
 int valid_IPDEntry(std::vector<Valid_Idx>& index_array,std::map<int,int>target_addr,int curr_count);
+int validate_while_run(int addr,int value,int kII);
+
+
 int add_IPDEntry(int BaseAddr,uint8_t shift,int kII,int last_idx_address);
 int classify_array();
 //打印IPD entry
