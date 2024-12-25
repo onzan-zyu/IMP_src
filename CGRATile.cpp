@@ -955,8 +955,9 @@ namespace HyCUBESim {
 			
 			// if(prefetchEnable)
 			// 	prefetch(op2,res,kII);
-			// validate_while_run(op2,res,kII);
+			validate_while_run(op2,res,kII);
 			AddressAnalyze(op2,kII,true);
+			prefetchEnable = false;
 		}
 		
 		// LOG_load_store(LOG_INFO,"load X=%d,Y=%d,current cycle=%d,address:%d,size:%d,load data =%d\n",this->X ,this->Y,cycle,op2,size,res);

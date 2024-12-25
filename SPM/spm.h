@@ -10,14 +10,15 @@
 #include "../IMP/DataType.h"
 #include "../IMP/IPD.h"
 // 地址的划分问题  32位地址 = tag + block index + block size
-#define OFFSET_BIT 6    //64B = 16 * 4B
+#define OFFSET_BIT 5    //64B = 16 * 4B
 #define BLOCK_SIZE (1 << OFFSET_BIT)
-#define BLOCK_INDEX_BIT 3  //SPM中block的数量
+#define BLOCK_INDEX_BIT 4  //SPM中block的数量
 #define SPM_BLOCK_NUM  (1 << BLOCK_INDEX_BIT)
 #define SPM_SIZE  (BLOCK_SIZE * SPM_BLOCK_NUM)    //spm划分为多少个block 64B*8=512B
 
 inline bool flag = true;
-
+inline int Prefetch_Block_Num = 0;
+inline int Prefetch_Block_Hit = 0;
 struct Block {
     bool valid;
     bool modified;
@@ -27,6 +28,8 @@ struct Block {
     uint32_t lastReference;
     int startAddr;
     int endAddr;
+    bool isPrefetch;
+    int hit_after_prefetch;
     Block() {
         valid = false;
         modified = false;
@@ -36,6 +39,8 @@ struct Block {
         lastReference = 0;
         startAddr = 0;
         endAddr = 0;
+        isPrefetch = false;
+        hit_after_prefetch = 0;
     }
 };
 struct SPM {
@@ -50,12 +55,16 @@ struct Statics {
     uint32_t numHit;
     uint32_t numMiss;
     uint32_t numLatency;
+    int hit_after_prefetch;
+    int num_prefetch;
     Statics() {
         numRead = 0;
         numWrite = 0;
         numHit = 0;
         numMiss = 0;
         numLatency = 0;
+        hit_after_prefetch = 0;
+        num_prefetch = 0;
     }
 };
 
@@ -74,7 +83,7 @@ void RWBuffersAnalyze();
 void AddressAnalyze(AddrWD addr,int kII,bool IsLoad);
 
 // 替换block
-bool replaceBlock(AddrWD addr,int cur_kII);
+bool replaceBlock(AddrWD addr,int cur_kII,bool isPrefetch);
 
 void printInfo();
 void printBlock();
