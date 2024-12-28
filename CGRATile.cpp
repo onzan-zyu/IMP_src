@@ -265,9 +265,9 @@ namespace HyCUBESim {
 				if(!Pisvalid || predicate){
 					//only store after checking predicate
 					//other operations dont care as the output is not routed.
-					if(kII>168920){
-						printf("storeH kII=%d,,address=%d,data=%d\n",kII,operand2,operand1);
-					}
+					// if(kII>168920){
+					// 	printf("storeH kII=%d,,address=%d,data=%d\n",kII,operand2,operand1);
+					// }
 					ALUTempOut = store(operand1,operand2,2,currIns.current_cycle,kII);
 				}
 				break;
@@ -276,9 +276,9 @@ namespace HyCUBESim {
 				if(!Pisvalid || predicate){
 					//only store after checking predicate
 					//other operations dont care as the output is not routed.
-					if(kII>168920){
-						printf("storeB kII=%d,,address=%d,data=%d\n",kII,operand2,operand1);
-					}
+					// if(kII>168920){
+					// 	printf("storeB kII=%d,,address=%d,data=%d\n",kII,operand2,operand1);
+					// }
 					ALUTempOut = store(operand1,operand2,1,currIns.current_cycle,kII);
 				}
 				break;
@@ -945,19 +945,17 @@ namespace HyCUBESim {
 		}
 		// printf(" load data=%d\n",res);
 		//loopstart 和loop end的读入过滤
-		if(kII>168920){
-			printf("kII=%d,bufferIdx=%d,address=%d,data=%d,size=%d\n",kII,bufferIdx,op2,res,size);
-		}
+		// if(kII>168920){
+		// 	printf("kII=%d,bufferIdx=%d,address=%d,data=%d,size=%d\n",kII,bufferIdx,op2,res,size);
+		// }
 		if(op2!=this->CGRA_MEMSIZE-2 && op2!=(this->CGRA_MEMSIZE-2)/2){
 			RWBuffers[bufferIdx++] = {(uint8_t)cycle,true,res,op2,false,kII};
 			
-			
-			
-			// if(prefetchEnable)
-			// 	prefetch(op2,res,kII);
+			if(prefetchEnable && prefetch_allow)
+				prefetch(op2,res,kII);
 			validate_while_run(op2,res,kII);
 			AddressAnalyze(op2,kII,true);
-			prefetchEnable = false;
+			// prefetchEnable = false;
 		}
 		
 		// LOG_load_store(LOG_INFO,"load X=%d,Y=%d,current cycle=%d,address:%d,size:%d,load data =%d\n",this->X ,this->Y,cycle,op2,size,res);

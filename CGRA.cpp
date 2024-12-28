@@ -372,14 +372,14 @@ int CGRA::executeCycle(int kII) {
 	if(kII%100==99 && IPDEnable){
 		int num = IPDentrys.size();
 		// printf("kII=%d,IPD entry size=%d,RWBuffer.size=%d ",kII,IPDentrys.size(),RWBuffers.size());
-		if(num<=10){//  间接访存模式较少   后面修改为SPM miss相关的数据
+		if(num<=3){//  间接访存模式较少   后面修改为SPM miss相关的数据
 			printf("detect buffer size:%d\n",RWBuffers.size());
 			Index_array_Detect();   // 检测Index数组
 			Detect_IMA_SPVM();
 			print_RWBuffers();
 			print_IPD();
 			LOG_IPDentry(LOG_INFO,"Detect IPD kII=%d,IPD analyse finised,IPD entry size=%d\n",kII,IPDentrys.size());
-			LOG_Buffer(LOG_INFO,"\n\n-------------------------------------one detect IMA cycle finished-----------------------------------------------\n\n");
+			// LOG_Buffer(LOG_INFO,"\n\n-------------------------------------one detect IMA cycle finished-----------------------------------------------\n\n");
 		}
 		// else if(num>=4){
 		// 	printf("classify buffer size:%d\n",RWBuffers.size());

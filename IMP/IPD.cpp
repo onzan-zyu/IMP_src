@@ -43,7 +43,7 @@ void print_RWBuffers(){
         }
 
     }
-    LOG_Buffer(LOG_INFO,"\n\n-------------------------------------execute cycle finished-----------------------------------------------\n\n");
+    // LOG_Buffer(LOG_INFO,"\n\n-------------------------------------execute cycle finished-----------------------------------------------\n\n");
 }
 
 // 用于rgb  由于rgb中存在 数据依赖关系的操作 cycle相同  删除了cycle限制的依赖
@@ -75,7 +75,7 @@ int Detect_IMA_rgb(){
                    {
                         flag ==1;
                     //    printf("find indirect memory access pattern! size = %d\n",prev);
-                       LOG_Buffer(LOG_INFO,"find indirect memory access pattern!");
+                    //    LOG_Buffer(LOG_INFO,"find indirect memory access pattern!");
                    }
                }
                prev = temp;
@@ -256,7 +256,8 @@ int Detect_IMA_SPVM(){
                             BaseAddr_struct[temp_addr].cnt++;
                             BaseAddr_struct[temp_addr].kII = RWBuffers[i].cur_kII;
                         }
-                        LOG_FILE(LOG_INFO,"BaseAddr_struct","RWBuffer[%d].addr=%d,RwBuffer[%d].value=%d,index kII=%d,target kII=%d,BaseAddr_Struct[%d].cnt=%d\n",
+                        char name[20] = "BaseAddr_struct";
+                        LOG_FILE(LOG_INFO,name,"RWBuffer[%d].addr=%d,RwBuffer[%d].value=%d,index kII=%d,target kII=%d,BaseAddr_Struct[%d].cnt=%d\n",
                             i,RWBuffers[i].address,j,RWBuffers[j].value,RWBuffers[j].cur_kII,RWBuffers[i].cur_kII,temp_addr,BaseAddr_struct[temp_addr].cnt);
 
                         // 距离当前计算的target超过7个周期 且命中数较少  remove
@@ -415,7 +416,8 @@ int valid_IPDEntry(std::vector<Valid_Idx>& index_array,std::map<int,int>target_a
                     if(it->second.hit_cnt>=10){
                         it->second.prefetch_valid = true;
                         prefetchEnable = true;//  启动预取
-                        LOG_FILE(LOG_INFO,"prefetch","base:%d,shift:2,hit_cnt:%d is used for prefetch\n",it->first,it->second.hit_cnt);
+                        char name[10] = "prefetch";
+                        LOG_FILE(LOG_INFO,name,"base:%d,shift:2,hit_cnt:%d is used for prefetch\n",it->first,it->second.hit_cnt);
                     }
                     LOG_Validate(LOG_INFO,"pattern hit! index:%d shift:%d baseaddr:%d  target:%d  hitcount:%d\n",
                     index_array[j].index_address,it->second.shift,it->first,temp,it->second.hit_cnt);
@@ -524,6 +526,8 @@ int validate_while_run(AddrWD addr,int value,int kII){
             if(pair->second.hit_cnt>4){
                 pair->second.prefetch_valid = true;
                 prefetchEnable = true;
+                char name[10] = "../output";
+                LOG_FILE(LOG_INFO,name,"IMP_miss before prefetch:%d\n",MyStatics.IMP_miss);
                 pair->second.target_gen.clear();//用于预取则清楚
             }
         }

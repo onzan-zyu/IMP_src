@@ -16,7 +16,7 @@ uint32_t getTag(AddrWD addr){
     return (addr >> (OFFSET_BIT + BLOCK_INDEX_BIT)) & mask;
 }
 // 采用全相联映射 LRU的置换策略
-int inSPM(AddrWD addr){
+int inSPM(AddrWD addr,int kII){
     for(int i=0;i<SPM_BLOCK_NUM;i++){
       // hit
       if(MySPM.blocks[i].startAddr<=addr && MySPM.blocks[i].valid && MySPM.blocks[i].endAddr>addr){
@@ -24,9 +24,11 @@ int inSPM(AddrWD addr){
           {
                 MyStatics.hit_after_prefetch++;//  统计总的预取后hit的block数
                 MySPM.blocks[i].hit_after_prefetch = 1;
-              LOG_FILE(LOG_INFO,"prefetch","prefetch hit tag=%d,index=%d,start:%d-end:%d,hit addr=%d,%s\n",
+                char name[20] = "BaseAddr_struct";
+                LOG_FILE(LOG_INFO,name,"prefetch hit tag=%d,index=%d,start:%d-end:%d,hit addr=%d,%s\n",
                 MySPM.blocks[i].tag,MySPM.blocks[i].index,MySPM.blocks[i].startAddr,MySPM.blocks[i].endAddr,addr,MySPM.blocks[i].isPrefetch?"Prefetch":"non-Prefetch");
           }
+          MySPM.blocks[i].lastReference = kII;
         return i;
       }
     }
@@ -56,11 +58,30 @@ uint32_t getReplacementBlockId(){
 void AddressAnalyze(AddrWD addr,int kII,bool IsLoad){
   if(IsLoad) MyStatics.numRead++;
   else MyStatics.numWrite++;
-  if(inSPM(addr)>=0){
+  if(inSPM(addr,kII)>=0){
     MyStatics.numHit++;
-    MySPM.blocks[inSPM(addr)].lastReference = kII;
-  }else if(inSPM(addr)==-1){
+    MySPM.blocks[inSPM(addr,kII)].lastReference = kII;
+  }else if(inSPM(addr,kII)==-1){
     MyStatics.numMiss++;
+
+
+    // 间接访存的地址要修改
+      //citeseer 536870912-536977376 get 
+      //cora   536870912-536957568    get
+      // enzymes 320000-400000 536870912-536950912 get
+      // pumbed 536870912-537186384  354592-670064 get
+      // ogbn   536870912-539580400  4664972-7374460  get
+      // rgb 0-2097152   536870912-537919488 
+      // src2dest 536870912-537395200
+    // if( (addr>320000&&addr <400000)  || (addr>536870912&&addr <536950912)) //enzymes
+    // if( (addr>354592&&addr <670064)  || (addr>536870912&&addr <537186384))  //pubmed
+    // if( (addr>4664972&&addr <7374460)  || (addr>536870912&&addr <539580400))   //ogbn
+    // if( (addr>0&&addr <2097152)  || (addr>536870912&&addr <537919488))  //rgb
+    if( (addr>536870912&&addr <537395200))
+    {
+      MyStatics.IMP_miss++;
+    }
+
     replaceBlock(addr,kII,false);
   }
   float missrate = (float)MyStatics.numMiss/(MyStatics.numHit+MyStatics.numMiss);
@@ -82,7 +103,7 @@ void prefetch(AddrWD addr, int value,int kII){
 
             AddrWD prefetchAddr = value*4+pair.first;
             char name[10] = "prefetch";
-            if (inSPM(prefetchAddr)<0)
+            if (inSPM(prefetchAddr,kII)<0)
             {
                 MyStatics.num_prefetch++;
                 replaceBlock(prefetchAddr,kII,true);
@@ -98,36 +119,37 @@ void prefetch(AddrWD addr, int value,int kII){
 
 
 // 弃用
-void RWBuffersAnalyze(){
-  for(int i=0;i<bufferIdx;i++){
-    if(RWBuffers[i].IsLoad)
-      MyStatics.numRead++;
-    else
-      MyStatics.numWrite++;
-    if(inSPM(RWBuffers[i].address)>=0){
-        MyStatics.numHit++;
-        MySPM.blocks[inSPM(RWBuffers[i].address)].lastReference = RWBuffers[i].cur_kII;
-    }else{
-      MyStatics.numMiss++;
-      // 将数据置换到SPM中
-      replaceBlock(RWBuffers[i].address,RWBuffers[i].cur_kII,false);
-    }
-  }
-}
+// void RWBuffersAnalyze(){
+//   for(int i=0;i<bufferIdx;i++){
+//     if(RWBuffers[i].IsLoad)
+//       MyStatics.numRead++;
+//     else
+//       MyStatics.numWrite++;
+//     if(inSPM(RWBuffers[i].address,0)>=0){
+//         MyStatics.numHit++;
+//         MySPM.blocks[inSPM(RWBuffers[i].address,0)].lastReference = RWBuffers[i].cur_kII;
+//     }else{
+//       MyStatics.numMiss++;
+//       // 将数据置换到SPM中
+//       replaceBlock(RWBuffers[i].address,RWBuffers[i].cur_kII,false);
+//     }
+//   }
+// }
 // 输出结果
 void output(){
   uint32_t delay = MyStatics.numHit+MyStatics.numMiss*15;
   float missrate = (float)MyStatics.numMiss/(MyStatics.numHit+MyStatics.numMiss);
     float accuracy = (float)MyStatics.hit_after_prefetch/MyStatics.num_prefetch;
   char name[10] = "../output";
-  LOG_FILE(LOG_INFO,name,"------------\nblock size=%d\nSPM_SIZE=%d\nspm_block_num=%d\n%s\nhitnum=%d\nmissnum=%d\nmissrate=%f\ndelay=%dcycles\nhit_after_prefetch=%d\ntotal_prefetch=%d\naccuracy=%f\n------------",
-        BLOCK_SIZE,SPM_SIZE,SPM_BLOCK_NUM,prefetchEnable?"prefetch":"non-prefetch",MyStatics.numHit,MyStatics.numMiss,missrate,delay,MyStatics.hit_after_prefetch,MyStatics.num_prefetch,accuracy);
-  printf("------------\nblock size=%d\nSPM_SIZE=%d\nspm_block_num=%d\n%s\nhitnum=%d\nmissnum=%d\nmissrate=%f\ndelay=%dcycles\nhit_after_prefetch=%d\ntotal_prefetch=%d\naccuracy=%f\n------------",
-        BLOCK_SIZE,SPM_SIZE,SPM_BLOCK_NUM,prefetchEnable?"prefetch":"non-prefetch",MyStatics.numHit,MyStatics.numMiss,missrate,delay,MyStatics.hit_after_prefetch,MyStatics.num_prefetch,accuracy);
+  LOG_FILE(LOG_INFO,name,"------------\nblock size=%d\nSPM_SIZE=%d\nspm_block_num=%d\n%s\nhit_num=%d\nmiss_num=%d\nmiss_rate=%f\ndelay=%dcycles\nhit_after_prefetch=%d\ntotal_prefetch=%d\naccuracy=%f\nIMP_miss=%d\nnon-IMP_miss=%d\n------------",
+        BLOCK_SIZE,SPM_SIZE,SPM_BLOCK_NUM,prefetch_allow?"prefetch":"non-prefetch",MyStatics.numHit,MyStatics.numMiss,missrate,delay,MyStatics.hit_after_prefetch,MyStatics.num_prefetch,accuracy,MyStatics.IMP_miss,MyStatics.numMiss-MyStatics.IMP_miss);
+  printf("------------\nblock size=%d\nSPM_SIZE=%d\nspm_block_num=%d\n%s\nhit_num=%d\nmiss_num=%d\nmiss_rate=%f\ndelay=%dcycles\nhit_after_prefetch=%d\ntotal_prefetch=%d\naccuracy=%f\nIMP_miss=%d\nnon-IMP_miss=%d\n------------",
+        BLOCK_SIZE,SPM_SIZE,SPM_BLOCK_NUM,prefetch_allow?"prefetch":"non-prefetch",MyStatics.numHit,MyStatics.numMiss,missrate,delay,MyStatics.hit_after_prefetch,MyStatics.num_prefetch,accuracy,MyStatics.IMP_miss,MyStatics.numMiss-MyStatics.IMP_miss);
 
 }
 bool replaceBlock(AddrWD addr,int cur_kII,bool isPrefetch){
     uint32_t id = getReplacementBlockId();
+    int previous = MySPM.blocks[id].lastReference;
     Block & b = MySPM.blocks[id];
     b.tag = getTag(addr);
     b.index = getIndex(addr);
@@ -138,8 +160,8 @@ bool replaceBlock(AddrWD addr,int cur_kII,bool isPrefetch){
     b.lastReference = cur_kII;
     b.isPrefetch = isPrefetch;
     b.hit_after_prefetch = 0;
-    LOG_Analyze(LOG_INFO,"cur_kII:%d addrese:%10d,Block %2d is replaced,tag=%6d,replace index=%4d,addr:%8d-%8d,%s\n",
-         cur_kII,addr,id,b.tag,b.index,b.startAddr,b.endAddr,b.isPrefetch?"Prefetch":"");
+    LOG_Analyze(LOG_INFO,"previous_kII=%d,cur_kII:%d addrese:%10d,Block %2d is replaced,tag=%6d, index=%4d,addr:%8d-%8d,%s,%s\n",
+         previous,cur_kII,addr,id,b.tag,b.index,b.startAddr,b.endAddr,b.isPrefetch?"Prefetch":"",b.hit_after_prefetch?"pre_hit":"pre_non_hit");
     return true;
 }
 uint32_t getStartAddr(AddrWD addr){

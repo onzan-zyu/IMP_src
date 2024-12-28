@@ -10,9 +10,9 @@
 #include "../IMP/DataType.h"
 #include "../IMP/IPD.h"
 // 地址的划分问题  32位地址 = tag + block index + block size
-#define OFFSET_BIT 5    //64B = 16 * 4B
+#define OFFSET_BIT 7    //64B = 16 * 4B
 #define BLOCK_SIZE (1 << OFFSET_BIT)
-#define BLOCK_INDEX_BIT 4  //SPM中block的数量
+#define BLOCK_INDEX_BIT 6  //SPM中block的数量
 #define SPM_BLOCK_NUM  (1 << BLOCK_INDEX_BIT)
 #define SPM_SIZE  (BLOCK_SIZE * SPM_BLOCK_NUM)    //spm划分为多少个block 64B*8=512B
 
@@ -57,6 +57,7 @@ struct Statics {
     uint32_t numLatency;
     int hit_after_prefetch;
     int num_prefetch;
+    int IMP_miss;
     Statics() {
         numRead = 0;
         numWrite = 0;
@@ -65,21 +66,25 @@ struct Statics {
         numLatency = 0;
         hit_after_prefetch = 0;
         num_prefetch = 0;
+        IMP_miss = 0;
     }
 };
+
 
 inline struct SPM MySPM;
 inline struct Statics MyStatics;
 inline bool prefetchEnable = false;
+inline bool prefetch_allow = true;
+
 
 uint32_t getOffset(AddrWD addr);
 uint32_t getIndex(AddrWD addr);
 uint32_t getTag(AddrWD addr);
 uint32_t getStartAddr(AddrWD addr);
 uint32_t getEndAddr(AddrWD addr);
-int inSPM(AddrWD addr);
+int inSPM(AddrWD addr,int kII);
 uint32_t getReplacementBlockId();
-void RWBuffersAnalyze();
+// void RWBuffersAnalyze();
 void AddressAnalyze(AddrWD addr,int kII,bool IsLoad);
 
 // 替换block
