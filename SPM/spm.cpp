@@ -16,6 +16,7 @@ uint32_t getTag(AddrWD addr){
     return (addr >> (OFFSET_BIT + BLOCK_INDEX_BIT)) & mask;
 }
 // 采用全相联映射 LRU的置换策略
+
 int inSPM(AddrWD addr,int kII){
     for(int i=0;i<SPM_BLOCK_NUM;i++){
       // hit
@@ -29,9 +30,19 @@ int inSPM(AddrWD addr,int kII){
                 MySPM.blocks[i].tag,MySPM.blocks[i].index,MySPM.blocks[i].startAddr,MySPM.blocks[i].endAddr,addr,MySPM.blocks[i].isPrefetch?"Prefetch":"non-Prefetch");
           }
           MySPM.blocks[i].lastReference = kII;
+
+        //  空间预取  顺序访存
+          if((addr-MySPM.blocks[i].last_address==4) && spatial_enable) {
+                MySPM.blocks[i].spatial_cnt++;
+              if((MySPM.blocks[i].spatial_cnt>(BLOCK_SIZE/8-1))&&(MySPM.blocks[i].endAddr-addr==4)) {
+                  spatial_prefetch(addr+8,kII,i);
+              }
+          }
+          MySPM.blocks[i].last_address = addr;
         return i;
       }
     }
+    
     return -1;
 }
 // 找到置换出SPM的块
@@ -61,6 +72,7 @@ void AddressAnalyze(AddrWD addr,int kII,bool IsLoad){
   if(inSPM(addr,kII)>=0){
     MyStatics.numHit++;
     MySPM.blocks[inSPM(addr,kII)].lastReference = kII;
+    // LOG_FILE(LOG_INFO,"../utilization","%d\n",kII);
   }else if(inSPM(addr,kII)==-1){
     MyStatics.numMiss++;
 
@@ -73,13 +85,17 @@ void AddressAnalyze(AddrWD addr,int kII,bool IsLoad){
       // ogbn   536870912-539580400  4664972-7374460  get
       // rgb 0-2097152   536870912-537919488 
       // src2dest 536870912-537395200
-    // if( (addr>320000&&addr <400000)  || (addr>536870912&&addr <536950912)) //enzymes
+      // pcm 0-524288 536870912-537395200   
+      // if( (addr>320000&&addr <400000)  || (addr>536870912&&addr <536950912)) //enzymes
     // if( (addr>354592&&addr <670064)  || (addr>536870912&&addr <537186384))  //pubmed
-    // if( (addr>4664972&&addr <7374460)  || (addr>536870912&&addr <539580400))   //ogbn
-    // if( (addr>0&&addr <2097152)  || (addr>536870912&&addr <537919488))  //rgb
-    if( (addr>536870912&&addr <537395200))
+    if( (addr>4664972&&addr <7374460)  || (addr>536870912&&addr <539580400))   //ogbn
+      // if( (addr>0&&addr <2097152)  || (addr>536870912&&addr <537919488))  //rgb
+    // if( (addr>536870912&&addr <537395200)) // src2dest
+    // if( (addr>536870912&&addr <537395200)||(addr>0&&addr <524288)) //pcm
+    // if(addr>536870912&&addr<536977376) //citeseer
+    // if(addr>536870912&&addr<536957568)// cora
     {
-      MyStatics.IMP_miss++;
+      MyStatics.IMP_miss++;    
     }
 
     replaceBlock(addr,kII,false);
@@ -116,6 +132,37 @@ void prefetch(AddrWD addr, int value,int kII){
     }
 }
 
+// 用于空间预取
+bool spatial_prefetch(AddrWD addr,int kII,int block_id) {
+    if(inSPM(addr,kII)==-1) {
+        Block prev = MySPM.blocks[block_id];
+        block_id = getReplacementBlockId();
+        char name[10] = "spatial";
+        //  记录被替换的块 是否是预取的块
+        int prev_start = prev.startAddr;
+        int prev_end   = prev.endAddr;
+        int last_addr = prev.last_address;
+        int spa_cnt =prev.spatial_cnt;
+
+        MySPM.blocks[block_id].tag = getTag(addr);
+        MySPM.blocks[block_id].index = getIndex(addr);
+        MySPM.blocks[block_id].valid = true;
+        MySPM.blocks[block_id].size = BLOCK_SIZE;
+        MySPM.blocks[block_id].startAddr = getStartAddr(addr);
+        MySPM.blocks[block_id].endAddr = getEndAddr(addr);
+        MySPM.blocks[block_id].lastReference = kII;
+        MySPM.blocks[block_id].isPrefetch = false;
+        MySPM.blocks[block_id].hit_after_prefetch = 0;
+        MySPM.blocks[block_id].last_address = 0;
+        MySPM.blocks[block_id].spatial_cnt = 0;
+        LOG_FILE(LOG_INFO,name,"pre_kII=%d,cur_kII:%d addr:%10d,replace block %2d,prev_addr:%8d-%8d,addr:%8d-%8d,last_addr=%d,spa_cnt=%d,cur_cnt=%d\n",
+         prev.lastReference,kII,addr,block_id,prev_start,prev_end,getStartAddr(addr),getEndAddr(addr),last_addr,spa_cnt,MySPM.blocks[block_id].spatial_cnt);
+
+
+        return true;
+    }
+    return false;
+}
 
 
 // 弃用
@@ -137,20 +184,25 @@ void prefetch(AddrWD addr, int value,int kII){
 // }
 // 输出结果
 void output(){
+  float missrate = 0.0;
   uint32_t delay = MyStatics.numHit+MyStatics.numMiss*15;
-  float missrate = (float)MyStatics.numMiss/(MyStatics.numHit+MyStatics.numMiss);
+   missrate = (float)MyStatics.numMiss/(MyStatics.numHit+MyStatics.numMiss);
     float accuracy = (float)MyStatics.hit_after_prefetch/MyStatics.num_prefetch;
-  char name[10] = "../output";
-  LOG_FILE(LOG_INFO,name,"------------\nblock size=%d\nSPM_SIZE=%d\nspm_block_num=%d\n%s\nhit_num=%d\nmiss_num=%d\nmiss_rate=%f\ndelay=%dcycles\nhit_after_prefetch=%d\ntotal_prefetch=%d\naccuracy=%f\nIMP_miss=%d\nnon-IMP_miss=%d\n------------",
-        BLOCK_SIZE,SPM_SIZE,SPM_BLOCK_NUM,prefetch_allow?"prefetch":"non-prefetch",MyStatics.numHit,MyStatics.numMiss,missrate,delay,MyStatics.hit_after_prefetch,MyStatics.num_prefetch,accuracy,MyStatics.IMP_miss,MyStatics.numMiss-MyStatics.IMP_miss);
-  printf("------------\nblock size=%d\nSPM_SIZE=%d\nspm_block_num=%d\n%s\nhit_num=%d\nmiss_num=%d\nmiss_rate=%f\ndelay=%dcycles\nhit_after_prefetch=%d\ntotal_prefetch=%d\naccuracy=%f\nIMP_miss=%d\nnon-IMP_miss=%d\n------------",
-        BLOCK_SIZE,SPM_SIZE,SPM_BLOCK_NUM,prefetch_allow?"prefetch":"non-prefetch",MyStatics.numHit,MyStatics.numMiss,missrate,delay,MyStatics.hit_after_prefetch,MyStatics.num_prefetch,accuracy,MyStatics.IMP_miss,MyStatics.numMiss-MyStatics.IMP_miss);
+  char name[20] = "../output/output";
+  LOG_FILE(LOG_INFO,name,"------------\nblock size=%d\nSPM_SIZE=%d\nspm_block_num=%d\n%s %s\nhit_num=%d\nmiss_num=%d\nmiss_rate=%f\ndelay=%dcycles\nhit_after_prefetch=%d\ntotal_prefetch=%d\naccuracy=%f\nIMP_miss=%d\nnon-IMP_miss=%d\n------------",
+        BLOCK_SIZE,SPM_SIZE,SPM_BLOCK_NUM,spatial_enable?"spatial":"no-spatial",prefetch_allow?"IMP":"non-IMP",MyStatics.numHit,MyStatics.numMiss,missrate,delay,MyStatics.hit_after_prefetch,MyStatics.num_prefetch,accuracy,MyStatics.IMP_miss,MyStatics.numMiss-MyStatics.IMP_miss);
+  printf("------------\nblock size=%d\nSPM_SIZE=%d\nspm_block_num=%d\n%s %s\nhit_num=%d\nmiss_num=%d\nmiss_rate=%f\ndelay=%dcycles\nhit_after_prefetch=%d\ntotal_prefetch=%d\naccuracy=%f\nIMP_miss=%d\nnon-IMP_miss=%d\n------------",
+        BLOCK_SIZE,SPM_SIZE,SPM_BLOCK_NUM,spatial_enable?"spatial":"no-spatial",prefetch_allow?"IMP":"non-IMP",MyStatics.numHit,MyStatics.numMiss,missrate,delay,MyStatics.hit_after_prefetch,MyStatics.num_prefetch,accuracy,MyStatics.IMP_miss,MyStatics.numMiss-MyStatics.IMP_miss);
 
 }
 bool replaceBlock(AddrWD addr,int cur_kII,bool isPrefetch){
     uint32_t id = getReplacementBlockId();
-    int previous = MySPM.blocks[id].lastReference;
-    Block & b = MySPM.blocks[id];
+    Block prev = MySPM.blocks[id];
+//  记录被替换的块 是否是预取的块
+    // LOG_Analyze(LOG_INFO,"previous_kII=%d,cur_kII:%d address:%10d,Block %2d is replaced,tag=%6d, index=%4d,addr:%8d-%8d,%s,%s\n",
+    //  prev.lastReference,cur_kII,addr,id,prev.tag,prev.index,prev.startAddr,prev.endAddr,prev.isPrefetch?"Prefetch":"",(prev.isPrefetch&&prev.hit_after_prefetch)?"pre_hit":"pre_non_hit");
+
+    Block  b = {};
     b.tag = getTag(addr);
     b.index = getIndex(addr);
     b.valid = true;
@@ -160,8 +212,12 @@ bool replaceBlock(AddrWD addr,int cur_kII,bool isPrefetch){
     b.lastReference = cur_kII;
     b.isPrefetch = isPrefetch;
     b.hit_after_prefetch = 0;
-    LOG_Analyze(LOG_INFO,"previous_kII=%d,cur_kII:%d addrese:%10d,Block %2d is replaced,tag=%6d, index=%4d,addr:%8d-%8d,%s,%s\n",
-         previous,cur_kII,addr,id,b.tag,b.index,b.startAddr,b.endAddr,b.isPrefetch?"Prefetch":"",b.hit_after_prefetch?"pre_hit":"pre_non_hit");
+    b.last_address = 0;
+    b.spatial_cnt = 0;
+    MySPM.blocks[id] = b;
+    LOG_Analyze(LOG_INFO,"pre_kII=%d,cur_kII:%d addr:%10d,replace block %2d,prev_addr:%8d-%8d,addr:%8d-%8d,last_addr=%d,prev_spa_cnt=%d,spa_cnt=%d\n",
+         prev.lastReference,cur_kII,addr,id,prev.startAddr,prev.endAddr,getStartAddr(addr),getEndAddr(addr),prev.last_address,prev.spatial_cnt,MySPM.blocks[id].spatial_cnt);
+
     return true;
 }
 uint32_t getStartAddr(AddrWD addr){

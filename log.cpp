@@ -387,9 +387,9 @@ void log_file(LogLevel level, char *name,const char *file, int line, const char 
     // 获取当前时间
     time_t now = time(NULL);
     char timeBuffer[26];
-    strftime(timeBuffer, 26, "%Y-%m-%d %H", localtime(&now));
+    strftime(timeBuffer, 26, "%m-%d_%H", localtime(&now));
     char logFileName[50];
-    snprintf(logFileName, sizeof(logFileName), "./log/%s_log_%s.txt",name, timeBuffer);
+    snprintf(logFileName, sizeof(logFileName), "./log/%s_%s.txt",name, timeBuffer);
     FILE *logFile = fopen(logFileName, "a");
     if (logFile == NULL) {
         perror("Failed to open log file");
@@ -411,7 +411,7 @@ void log_file(LogLevel level, char *name,const char *file, int line, const char 
     fprintf(logFile, "(%d): ", line);
     // fprintf(logFile, "(%s:%d): ",  file, line);
     vfprintf(logFile, format, args);
-    fprintf(logFile, "\n");
+    // fprintf(logFile, "\n");
     va_end(args);
 
     fclose(logFile);

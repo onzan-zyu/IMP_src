@@ -244,7 +244,7 @@ int Detect_IMA_SPVM(){
                 if (RWBuffers[j].IsIndex  &&  RWBuffers[i].cur_kII-RWBuffers[j].cur_kII<2*InitialInterval)
                 {
                     int temp_addr = RWBuffers[i].address - RWBuffers[j].value*4;
-                    if (temp_addr>0)
+                    if (temp_addr>=0)
                     {    //  存储反向计算的基地址
                         if(BaseAddr_struct.find(temp_addr)==BaseAddr_struct.end()){// 创建新的
                             struct cnt_info temp_info;
@@ -526,7 +526,7 @@ int validate_while_run(AddrWD addr,int value,int kII){
             if(pair->second.hit_cnt>4){
                 pair->second.prefetch_valid = true;
                 prefetchEnable = true;
-                char name[10] = "../output";
+                char name[20] = "../output/output";
                 LOG_FILE(LOG_INFO,name,"IMP_miss before prefetch:%d\n",MyStatics.IMP_miss);
                 pair->second.target_gen.clear();//用于预取则清楚
             }

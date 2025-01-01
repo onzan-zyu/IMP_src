@@ -348,6 +348,7 @@ void CGRA::invokeCGRA(HyCUBESim::CGRA& cgraInstance) {
 }
 
 int CGRA::executeCycle(int kII) {
+	int temp = MyStatics.numMiss;
 	for (int y = 0; y < sizeY; ++y) {
 		for (int x = 0; x < sizeX; ++x) {
 			CGRATiles[y][x]->execute(kII);
@@ -359,6 +360,14 @@ int CGRA::executeCycle(int kII) {
 			CGRATiles[y][x]->updateRegisters();
 			CGRATiles[y][x]->updatePC();
 		}
+	}
+	if(MyStatics.numMiss==temp){
+		char *name = (char *)(malloc(40 * sizeof(char)));
+		if(name==NULL){
+			printf("utilization malloc malloc error \n");
+		}
+        sprintf(name,"../output/uti_%s",prefetch_allow?"pf":"no_pf");
+        LOG_FILE(LOG_INFO,name,"%d\n",kII);
 	}
 	// printf("executeCycle finish\n");
 	//  执行一次循环将进行一次间接访存分析和依次间接访存模式匹配
@@ -372,7 +381,7 @@ int CGRA::executeCycle(int kII) {
 	if(kII%100==99 && IPDEnable){
 		int num = IPDentrys.size();
 		// printf("kII=%d,IPD entry size=%d,RWBuffer.size=%d ",kII,IPDentrys.size(),RWBuffers.size());
-		if(num<=3){//  间接访存模式较少   后面修改为SPM miss相关的数据
+		if(num<3){//  间接访存模式较少   后面修改为SPM miss相关的数据
 			printf("detect buffer size:%d\n",RWBuffers.size());
 			Index_array_Detect();   // 检测Index数组
 			Detect_IMA_SPVM();
