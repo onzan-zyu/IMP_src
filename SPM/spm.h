@@ -9,16 +9,19 @@
 #include "../log.h"
 #include "../IMP/DataType.h"
 #include "../IMP/IPD.h"
+#include<map>
 // 地址的划分问题  32位地址 = tag + block index + block size
-#define OFFSET_BIT 5    //64B = 16 * 4B
+#define OFFSET_BIT 4    //64B = 16 * 4B
 #define BLOCK_SIZE (1 << OFFSET_BIT)
 #define BLOCK_INDEX_BIT 4  //SPM中block的数量
 #define SPM_BLOCK_NUM  (1 << BLOCK_INDEX_BIT)
 // #define SPM_BLOCK_NUM  32
 #define SPM_SIZE  (BLOCK_SIZE * SPM_BLOCK_NUM)    //spm划分为多少个block 64B*8=512B
 inline bool prefetchEnable = false;
-inline bool prefetch_allow = false;
-inline bool spatial_enable = false;
+inline bool prefetch_allow = true;
+inline bool spatial_enable = true;
+// 存储预取的块的hit信息  反向调节
+inline std::map<uint32_t,int> prefetch_Hit;
 
 inline bool flag = true;
 inline int Prefetch_Block_Num = 0;
@@ -33,6 +36,7 @@ struct Block {
     int startAddr;
     int endAddr;
     bool isPrefetch;
+    uint32_t prefetchBase;
     int hit_after_prefetch;
         int last_address;
     int spatial_cnt;
@@ -49,6 +53,7 @@ struct Block {
         hit_after_prefetch = 0;
         last_address = 0;
         spatial_cnt = 0;
+        prefetchBase = -1;
     }
 };
 struct SPM {
@@ -95,7 +100,7 @@ uint32_t getReplacementBlockId();
 void AddressAnalyze(AddrWD addr,int kII,bool IsLoad);
 
 // 替换block
-bool replaceBlock(AddrWD addr,int cur_kII,bool isPrefetch);
+bool replaceBlock(AddrWD addr,int cur_kII,bool isPrefetch,AddrWD prefetchBase);
 
 void printInfo();
 void printBlock();

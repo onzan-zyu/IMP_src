@@ -369,10 +369,7 @@ int CGRA::executeCycle(int kII) {
         sprintf(name,"../output/uti_%s",prefetch_allow?"pf":"no_pf");
         LOG_FILE(LOG_INFO,name,"%d\n",kII);
 	}
-	// printf("executeCycle finish\n");
-	//  执行一次循环将进行一次间接访存分析和依次间接访存模式匹配
-	// src2dest count等于40 可识别到间接访存模式kII%120==119
-	// printf("IPD size=%d\n",IPDentrys.size());
+
 	if(kII %10000==9999) {
 		printInfo();
 		printBlock();
@@ -390,27 +387,6 @@ int CGRA::executeCycle(int kII) {
 			LOG_IPDentry(LOG_INFO,"Detect IPD kII=%d,IPD analyse finised,IPD entry size=%d\n",kII,IPDentrys.size());
 			// LOG_Buffer(LOG_INFO,"\n\n-------------------------------------one detect IMA cycle finished-----------------------------------------------\n\n");
 		}
-		// else if(num>=4){
-		// 	printf("classify buffer size:%d\n",RWBuffers.size());
-		// 	LOG_IPDentry(LOG_INFO,"valid IPD  kII=%d IPD entry size=%d,RWBUffer size=%d\n",kII,IPDentrys.size(),RWBuffers.size());
-		// 	Index_array_Detect();
-		// 	classify_array(); // 对应index target的clear
-		// 	//kII传入的是当前的count  用于移除与当前count相差较远且hit次数少的pattern
-		// 	valid_IPDEntry(index_array,target_addr,kII);
-		// 	print_RWBuffers();
-		// 	print_IPD();
-		// 	LOG_IPDentry(LOG_INFO,"validate IPD kII=%d,validate finised,IPD entry size=%d\n",kII,IPDentrys.size());
-
-		// 	if(index_array.size()>0){
-		// 		index_array.clear();
-		// 	}
-		// 	if(target_addr.size()>0){
-		// 		target_addr.clear();
-		// 	}
-
-		// }
-
-
 
 		if(RWBuffers.size()!=0){
 				RWBuffers.clear();
