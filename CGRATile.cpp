@@ -950,10 +950,12 @@ namespace HyCUBESim {
 		// }
 		if(op2!=this->CGRA_MEMSIZE-2 && op2!=(this->CGRA_MEMSIZE-2)/2){
 			RWBuffers[bufferIdx++] = {(uint8_t)cycle,true,res,op2,false,kII};
-			
+			// 根据address value kII来对识别到的间接访存模式验证
+			validate_while_run(op2,res,kII);
+			// 检测到了间接访存模式 且 允许间接访存
 			if(prefetchEnable && prefetch_allow)
 				prefetch(op2,res,kII);
-			validate_while_run(op2,res,kII);
+			// 地址的访问
 			AddressAnalyze(op2,kII,true);
 			// prefetchEnable = false;
 		}

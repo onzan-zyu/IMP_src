@@ -11,21 +11,23 @@
 #include "../IMP/IPD.h"
 #include<map>
 // 地址的划分问题  32位地址 = tag + block index + block size
-#define OFFSET_BIT 4    //64B = 16 * 4B
+#define OFFSET_BIT 4    //
 #define BLOCK_SIZE (1 << OFFSET_BIT)
 #define BLOCK_INDEX_BIT 4  //SPM中block的数量
 #define SPM_BLOCK_NUM  (1 << BLOCK_INDEX_BIT)
 // #define SPM_BLOCK_NUM  32
 #define SPM_SIZE  (BLOCK_SIZE * SPM_BLOCK_NUM)    //spm划分为多少个block 64B*8=512B
-inline bool prefetchEnable = false;
-inline bool prefetch_allow = true;
-inline bool spatial_enable = true;
+
+inline bool prefetch_allow = true;   //是否支持IMP预取
+inline bool spatial_enable = false;  // 是否支持stride预取
+inline bool reduce_traffic_Enable = true;//  流量剪裁
 // 存储预取的块的hit信息  反向调节
 inline std::map<uint32_t,int> prefetch_Hit;
 
 inline bool flag = true;
-inline int Prefetch_Block_Num = 0;
+inline int Prefetch_Block_Num = 0; 
 inline int Prefetch_Block_Hit = 0;
+inline bool prefetchEnable = false;  //当检测到间接访存模式后的 预取启动信号
 struct Block {
     bool valid;
     bool modified;
@@ -71,6 +73,7 @@ struct Statics {
     int hit_after_prefetch;
     int num_prefetch;
     int IMP_miss;
+    int num_IMP;
     Statics() {
         numRead = 0;
         numWrite = 0;
@@ -80,6 +83,7 @@ struct Statics {
         hit_after_prefetch = 0;
         num_prefetch = 0;
         IMP_miss = 0;
+        num_IMP = 0;
     }
 };
 

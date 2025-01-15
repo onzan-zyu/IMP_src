@@ -370,15 +370,16 @@ int CGRA::executeCycle(int kII) {
         LOG_FILE(LOG_INFO,name,"%d\n",kII);
 	}
 
-	if(kII %10000==9999) {
-		printInfo();
-		printBlock();
-	}
+	// if(kII %10000==9999) {
+	// 	printInfo();
+	// 	printBlock();
+	// }
 
 	if(kII%100==99 && IPDEnable){
 		int num = IPDentrys.size();
+		float missRate = float(MyStatics.numMiss)/(MyStatics.numHit+MyStatics.numMiss);
 		// printf("kII=%d,IPD entry size=%d,RWBuffer.size=%d ",kII,IPDentrys.size(),RWBuffers.size());
-		if(num<3){//  间接访存模式较少   后面修改为SPM miss相关的数据
+		if(missRate>0.05){//  间接访存模式较少   后面修改为SPM miss相关的数据
 			printf("detect buffer size:%d\n",RWBuffers.size());
 			Index_array_Detect();   // 检测Index数组
 			Detect_IMA_SPVM();

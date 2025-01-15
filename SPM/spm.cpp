@@ -53,6 +53,30 @@ void AddressAnalyze(AddrWD addr,int kII,bool IsLoad){
   if(IsLoad) MyStatics.numRead++;
   else MyStatics.numWrite++;
   int blockId = inSPM(addr,kII);
+
+  // 间接访存的地址要修改
+      //citeseer 536870912-536977376 get 
+      //cora   536870912-536957568    get
+      // enzymes 320000-400000 536870912-536950912 get
+      // pumbed 536870912-537186384  354592-670064 get
+      // ogbn   536870912-539580400  4664972-7374460  get
+      // rgb 0-2097152   536870912-537919488 
+      // src2dest 536870912-537395200
+      // pcm 0-524288 536870912-537395200   
+      // if( (addr>=320000&&addr <400000)  || (addr>=536870912&&addr <536950912)) //enzymes
+    // if( (addr>=354592&&addr <670064)  || (addr>=536870912&&addr <537186384))  //pubmed
+    // if( (addr>=4664972&&addr <7374460)  || (addr>=536870912&&addr <539580400))   //ogbn
+      // if( (addr>=0&&addr <2097152)  || (addr>=536870912&&addr <537919488))  //rgb
+    // if( (addr>=536870912&&addr <537395200)) // src2dest
+    // if( (addr>=536870912&&addr <537395200)||(addr>=0&&addr <524288)) //pcm
+    if(addr>=536870912&&addr<536977376) //citeseer
+    // if(addr>=536870912&&addr<537395200)  //src2dest
+    // if(addr>=536870912&&addr<536957568)// cora
+    // if((addr>=524288&&addr<1048576)||(addr>=537919488 && addr<538434775))  //Grad
+    {
+      MyStatics.num_IMP++;
+    }
+
   if(blockId>=0){
     MyStatics.numHit++;
     MySPM.blocks[blockId].lastReference = kII;
@@ -61,13 +85,15 @@ void AddressAnalyze(AddrWD addr,int kII,bool IsLoad){
                 MyStatics.hit_after_prefetch++;//  统计总的预取后hit的block数
                 MySPM.blocks[blockId].hit_after_prefetch = 1;
                 uint32_t base = MySPM.blocks[blockId].prefetchBase;
-                  //  反向统计hit信息
-                  if(prefetch_Hit.find(base)!=prefetch_Hit.end()) {
+                  //  反向统计prefetch  entry 的hit信息
+                  if(prefetch_Hit.find(base)==prefetch_Hit.end()) { //没有已有的hit信息
+                      prefetch_Hit[base]=1;
+                  }
+                  else {// 存在已有的hit信息
                       prefetch_Hit[base]++;
                   }
-                  else {
-                      prefetch_Hit[base] = 1;
-                  }
+                  printf("prefetch hit,curr kII:%d,base:%d,cnt%d\n",kII,base,prefetch_Hit[base]);
+                  LOG_FILE(LOG_INFO,"../output/remove","prefetch hit,curr kII:%d,base:%d,cnt%d\n",kII,base,prefetch_Hit[base]);
 
 
                 char name[20] = "BaseAddr_struct";
@@ -98,14 +124,16 @@ void AddressAnalyze(AddrWD addr,int kII,bool IsLoad){
       // rgb 0-2097152   536870912-537919488 
       // src2dest 536870912-537395200
       // pcm 0-524288 536870912-537395200   
-      // if( (addr>320000&&addr <400000)  || (addr>536870912&&addr <536950912)) //enzymes
-    // if( (addr>354592&&addr <670064)  || (addr>536870912&&addr <537186384))  //pubmed
-    // if( (addr>4664972&&addr <7374460)  || (addr>536870912&&addr <539580400))   //ogbn
-      // if( (addr>0&&addr <2097152)  || (addr>536870912&&addr <537919488))  //rgb
-    // if( (addr>536870912&&addr <537395200)) // src2dest
-    // if( (addr>536870912&&addr <537395200)||(addr>0&&addr <524288)) //pcm
-    // if(addr>536870912&&addr<536977376) //citeseer
-    if(addr>536870912&&addr<536957568)// cora
+      // if( (addr>=320000&&addr <400000)  || (addr>=536870912&&addr <536950912)) //enzymes
+    // if( (addr>=354592&&addr <670064)  || (addr>=536870912&&addr <537186384))  //pubmed
+    // if( (addr>=4664972&&addr <7374460)  || (addr>=536870912&&addr <539580400))   //ogbn
+      // if( (addr>=0&&addr <2097152)  || (addr>=536870912&&addr <537919488))  //rgb
+    // if( (addr>=536870912&&addr <537395200)) // src2dest
+    // if( (addr>=536870912&&addr <537395200)||(addr>=0&&addr <524288)) //pcm
+    if(addr>=536870912&&addr<536977376) //citeseer
+    // if(addr>=536870912&&addr<537395200)  //src2dest
+    // if(addr>=536870912&&addr<536957568)// cora
+    // if((addr>=524288&&addr<1048576)||(addr>=537919488 && addr<538434775))  //Grad
     {
       MyStatics.IMP_miss++;    
     }
@@ -128,26 +156,36 @@ void prefetch(AddrWD addr, int value,int kII){
     for(auto&pair : IPDentrys){
 
       //  用于根据预取块的accuracy来裁剪预取流量
-        if((kII-pair.second.kII>10*InitialInterval)&&(prefetch_Hit.find(pair.first)!=prefetch_Hit.end())) {
-            pair.second.prefetch_valid = false;
-            pair.second.hit_cnt = 0;
-            // pair.second.valid =false;
-        }
-        if((addr-pair.second.last_index_address<16)&&pair.second.prefetch_valid){
-            //  与当前间接访存模式的最新索引地址差较小----和IPDentry绑定
-
-            AddrWD prefetchAddr = value*4+pair.first;
-            char name[10] = "prefetch";
-            if (inSPM(prefetchAddr,kII)<0)
-            {
-                MyStatics.num_prefetch++;
-                replaceBlock(prefetchAddr,kII,true,pair.first);
-                LOG_FILE(LOG_INFO,name,"kII=%d,idx=%d,IPDlastidx=%d,IPD.base=%d,prefetch_addr=%d,block tag=%d,index=%d,%8d-%8d\n",
-                kII,addr,pair.second.last_index_address,pair.first,prefetchAddr,getTag(prefetchAddr),getIndex(prefetchAddr),getStartAddr(prefetchAddr),getEndAddr(prefetchAddr));
-            }
-            pair.second.last_index_address = addr;  // 更新最新的索引
-
-        }
+      if(reduce_traffic_Enable){
+          if((kII-pair.second.kII>30*InitialInterval)&&(prefetch_Hit.find(pair.first)==prefetch_Hit.end())) {
+              pair.second.prefetch_valid = false;
+              pair.second.hit_cnt = 0;
+              pair.second.valid =false;// 移除
+          }
+          // 从预取开始经过50个Initial Interval，预取block命中次数小于3 
+          if (prefetch_Hit.find(pair.first)!=prefetch_Hit.end()&&prefetch_Hit[pair.first]<3 &&(kII-pair.second.kII>50*InitialInterval))
+          {
+              printf("remove base:%d,curr kII;%d, prefetch kII:%d, hit_cnt:%d\n",pair.first,kII,pair.second.kII,prefetch_Hit[pair.first]);
+              LOG_FILE(LOG_INFO,"../output/remove","remove base:%d,curr kII;%d, prefetch kII:%d, hit_cnt:%d\n",pair.first,kII,pair.second.kII,prefetch_Hit[pair.first]);
+              pair.second.valid = false;
+              pair.second.hit_cnt = 0;
+              pair.second.prefetch_valid = false;
+          }
+      }
+      // 预取和last index相近的index
+      if((addr-pair.second.last_index_address<16)&&pair.second.prefetch_valid){
+          //  与当前间接访存模式的最新索引地址差较小----和IPDentry绑定
+          AddrWD prefetchAddr = value*4+pair.first;
+          char name[10] = "prefetch";
+          if (inSPM(prefetchAddr,kII)<0)
+          {
+              MyStatics.num_prefetch++;
+              replaceBlock(prefetchAddr,kII,true,pair.first);
+              LOG_FILE(LOG_INFO,name,"kII=%d,idx=%d,IPDlastidx=%d,IPD.base=%d,prefetch_addr=%d,block tag=%d,index=%d,%8d-%8d\n",
+              kII,addr,pair.second.last_index_address,pair.first,prefetchAddr,getTag(prefetchAddr),getIndex(prefetchAddr),getStartAddr(prefetchAddr),getEndAddr(prefetchAddr));
+          }
+          pair.second.last_index_address = addr;  // 更新最新的索引
+      }
     }
 }
 
@@ -208,11 +246,14 @@ void output(){
    missrate = (float)MyStatics.numMiss/(MyStatics.numHit+MyStatics.numMiss);
     float accuracy = (float)MyStatics.hit_after_prefetch/MyStatics.num_prefetch;
   char name[20] = "../output/output";
-  LOG_FILE(LOG_INFO,name,"------------\nblock size=%d\nSPM_SIZE=%d\nspm_block_num=%d\n%s %s\nhit_num=%d\nmiss_num=%d\nmiss_rate=%f\ndelay=%dcycles\nhit_after_prefetch=%d\ntotal_prefetch=%d\naccuracy=%f\nIMP_miss=%d\nnon-IMP_miss=%d\n------------",
-        BLOCK_SIZE,SPM_SIZE,SPM_BLOCK_NUM,spatial_enable?"spatial":"no-spatial",prefetch_allow?"IMP":"non-IMP",MyStatics.numHit,MyStatics.numMiss,missrate,delay,MyStatics.hit_after_prefetch,MyStatics.num_prefetch,accuracy,MyStatics.IMP_miss,MyStatics.numMiss-MyStatics.IMP_miss);
-  printf("------------\nblock size=%d\nSPM_SIZE=%d\nspm_block_num=%d\n%s %s\nhit_num=%d\nmiss_num=%d\nmiss_rate=%f\ndelay=%dcycles\nhit_after_prefetch=%d\ntotal_prefetch=%d\naccuracy=%f\nIMP_miss=%d\nnon-IMP_miss=%d\n------------",
-        BLOCK_SIZE,SPM_SIZE,SPM_BLOCK_NUM,spatial_enable?"spatial":"no-spatial",prefetch_allow?"IMP":"non-IMP",MyStatics.numHit,MyStatics.numMiss,missrate,delay,MyStatics.hit_after_prefetch,MyStatics.num_prefetch,accuracy,MyStatics.IMP_miss,MyStatics.numMiss-MyStatics.IMP_miss);
-
+  LOG_FILE(LOG_INFO,name,"------------\nblock size=%d\nSPM_SIZE=%d\nspm_block_num=%d\n%s %s %s\nhit_num=%d\nmiss_num=%d\nmiss_rate=%f\nIMP_num=%d\ndelay=%dcycles\nhit_after_prefetch=%d\ntotal_prefetch=%d\naccuracy=%f\nIMP_miss=%d\nnon-IMP_miss=%d\n------------",
+        BLOCK_SIZE,SPM_SIZE,SPM_BLOCK_NUM,spatial_enable?"spatial":"no-spatial",prefetch_allow?"IMP":"non-IMP",reduce_traffic_Enable?"reduce_traffic":"no-reduce_traffic",MyStatics.numHit,MyStatics.numMiss,missrate,MyStatics.num_IMP,delay,MyStatics.hit_after_prefetch,MyStatics.num_prefetch,accuracy,MyStatics.IMP_miss,MyStatics.numMiss-MyStatics.IMP_miss);
+  printf("------------\nblock size=%d\nSPM_SIZE=%d\nspm_block_num=%d\n%s %s %s\nhit_num=%d\nmiss_num=%d\nmiss_rate=%f\nIMP_num=%d\ndelay=%dcycles\nhit_after_prefetch=%d\ntotal_prefetch=%d\naccuracy=%f\nIMP_miss=%d\nnon-IMP_miss=%d\n------------",
+        BLOCK_SIZE,SPM_SIZE,SPM_BLOCK_NUM,spatial_enable?"spatial":"no-spatial",prefetch_allow?"IMP":"non-IMP",reduce_traffic_Enable?"reduce_traffic":"no-reduce_traffic",MyStatics.numHit,MyStatics.numMiss,missrate,MyStatics.num_IMP,MyStatics.hit_after_prefetch,MyStatics.num_prefetch,accuracy,MyStatics.IMP_miss,MyStatics.numMiss-MyStatics.IMP_miss);
+  printf("info of prefetch hit\n");
+    for(const auto pair : prefetch_Hit) {
+        printf("base:%d,hit cnt:%d\n",pair.first,pair.second);
+    }
 }
 bool replaceBlock(AddrWD addr,int cur_kII,bool isPrefetch,AddrWD prefetchBase){
     uint32_t id = getReplacementBlockId();

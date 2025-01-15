@@ -229,12 +229,12 @@ std::map<int,cnt_info> BaseAddr_struct;//when shift ==2
 
 int Detect_IMA_SPVM(){
       // 根据索引计算base addr
-    printf("IMA  detect\n");
+    // printf("IMA  detect\n");s
     LOG_CALCULATE(LOG_INFO,"InitialInterval=%d\n",InitialInterval);
-   if(RWBuffers.size()==0){
+    if(RWBuffers.size()==0){
         printf("RWBuffer size==0\n");
         return 0;
-   }
+    }
     for (int i = 1; i < RWBuffers.size(); i++)
     {
         if ( (!RWBuffers[i].IsIndex) && RWBuffers[i].IsLoad) // 非索引地址且是load操作  i----target
@@ -311,7 +311,6 @@ int Index_array_Detect(){
         printf(" idx detect RWBuffer size==0\n");
         return 0;
    }
-
     for (int i = 1; i < RWBuffers.size(); i++)
     {
         pre_addr = RWBuffers[i].address;
@@ -345,7 +344,7 @@ int Index_array_Detect(){
                }
            }//  排除地址相同 非索引
            else if (RWBuffers[j].value==RWBuffers[idx.back()].value && RWBuffers[j].address==RWBuffers[idx.back()].address)
-            {
+        {
                 idx.push_back(j);
                 if (idx.size()>=3) // 4个
                 {
@@ -486,7 +485,7 @@ int validate_while_run(AddrWD addr,int value,int kII){
     int IsIndex= 0;
     //  用索引和IPD　entry生成目标地址
     for( auto pair = IPDentrys.begin(); pair != IPDentrys.end();++pair){
-        // 用于预取的模式跳过
+        // 用于预取的模式 不需验证
         if(pair->second.prefetch_valid){
             continue;
         }
@@ -522,16 +521,16 @@ int validate_while_run(AddrWD addr,int value,int kII){
             // printf("hit target addr=%d\n",addr);
             LOG_Validate(LOG_INFO,"pattern hit: base;%d,index:%d,target:%d,hit_cnt:%d\n",
                           pair->first,(addr-pair->first)/4,addr,pair->second.hit_cnt);
-            // pair->second.kII = kII;//  命中后修改kII
+            // pair->second.kII = kII;
             if(pair->second.hit_cnt>4){
                 pair->second.prefetch_valid = true;
                 prefetchEnable = true;
+                pair->second.kII = kII;   // 用于预取的entry的kII为开始预取的kII
                 char name[20] = "../output/output";
                 LOG_FILE(LOG_INFO,name,"IMP_miss before prefetch:%d\n",MyStatics.IMP_miss);
                 pair->second.target_gen.clear();//用于预取则清楚
             }
         }
-        // 每次命中会更新entry的kII
         if (kII-pair->second.kII>5*InitialInterval&&(!pair->second.prefetch_valid)&&pair->second.hit_cnt<3)
         {
             pair->second.valid = false;
@@ -540,6 +539,7 @@ int validate_while_run(AddrWD addr,int value,int kII){
     LOG_IPDentry(LOG_INFO,"current_kII=%d\n",kII);
     print_IPD();
 
+    // 移除预取过程中效果差的间接访存模式
     for(auto it = IPDentrys.begin(); it != IPDentrys.end();){
         if(  !it->second.valid){
             LOG_Index(LOG_INFO,"remove baseadr:%d,hit_cnt:%d\n",it->first,it->second.hit_cnt);
